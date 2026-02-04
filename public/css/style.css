@@ -1,0 +1,243 @@
+/* public/css/style.css */
+:root {
+    --primary-blue: #0e5b8e;
+    --primary-yellow: #fecb00;
+    --bg-light: #f4f7fa;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-light);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* --- NAVBAR UTAMA --- */
+.navbar {
+    background-color: var(--primary-blue);
+    padding: 15px 0;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    /* Transisi halus untuk efek scroll */
+    transition: all 0.4s ease-in-out;
+}
+
+.navbar-brand {
+    color: white !important;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.brand-title {
+    line-height: 1;
+    font-size: 1.5rem; /* fs-4 equivalent approx */
+}
+
+.brand-subtitle {
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+}
+
+/* Wrapper Konten Utama */
+#main-content {
+    padding-top: 120px;
+    min-height: 60vh; /* Agar footer tidak naik jika konten sedikit */
+}
+
+.nav-link {
+    color: white !important;
+    font-weight: 500;
+    margin-left: 20px;
+    transition: color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: var(--primary-yellow) !important;
+}
+
+/* --- EFEK SCROLL NAVBAR (Gaya Banyuwangi) --- */
+/* Kelas ini akan ditambahkan otomatis oleh JavaScript saat discroll */
+
+.navbar-scrolled {
+    background-color: #ffffff !important; /* Latar berubah Putih */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Bayangan lebih lembut */
+    padding: 10px 0 !important; /* Navbar sedikit mengecil */
+}
+
+/* Ubah warna teks menu jadi Biru saat scroll */
+.navbar-scrolled .nav-link {
+    color: var(--primary-blue) !important;
+}
+
+/* Ubah warna teks Logo (eSakip & Kabupaten) jadi Biru saat scroll */
+.navbar-scrolled .brand-text h1,
+.navbar-scrolled .brand-text p,
+.navbar-scrolled .brand-text span {
+    color: var(--primary-blue) !important;
+}
+
+/* Hover menu tetap Kuning */
+.navbar-scrolled .nav-link:hover {
+    color: var(--primary-yellow) !important;
+}
+
+/* Ubah icon hamburger (mobile) jadi hitam/gelap saat background putih */
+.navbar-scrolled .navbar-toggler-icon {
+    filter: invert(1); 
+}
+.navbar-scrolled .navbar-toggler {
+    border-color: rgba(0,0,0,0.1);
+}
+
+/* --- DASHBOARD HERO --- */
+.hero-section {
+    background-color: var(--primary-blue);
+    color: white;
+    padding-bottom: 150px;
+    padding-top: 130px;
+    margin-top: -120px;
+    display: flex;
+    align-items: center; 
+    min-height: 50vh;
+    border-bottom-left-radius: 60px;
+    border-bottom-right-radius: 60px;
+    position: relative;
+    z-index: 1;
+}
+
+.hero-text-wrapper {
+    margin-top: -40px;
+}
+
+.hero-img-custom {
+    max-height: 350px; 
+    opacity: 0.8;
+    width: auto;
+    max-width: 100%;
+}
+
+.hero-section .col-md-6.text-end {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+/* Container kartu menu yang overlap ke atas */
+.dashboard-cards-overlap {
+    margin-top: -80px;
+    position: relative;
+    z-index: 10;
+}
+
+/* --- CARDS MENU --- */
+.card-menu {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.card-menu:hover {
+    transform: translateY(-5px);
+}
+.card-menu i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: #555;
+}
+.btn-grey-custom {
+    background-color: #dcdcdc;
+    color: #333;
+    font-weight: bold;
+    border: none;
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    margin-top: 15px;
+}
+.btn-grey-custom:hover {
+    background-color: #c0c0c0;
+}
+
+/* --- SECTION PRIORITAS (Dashboard Bawah) --- */
+.priority-section {
+    background-color: var(--primary-blue);
+    padding-top: 60px;
+    padding-bottom: 40px;
+    border-top-left-radius: 60px;
+    border-top-right-radius: 60px;
+    margin-top: 30px;
+    color: white;
+}
+
+.priority-divider {
+    width: 50%;
+    margin: 0 auto 30px auto;
+    border-color: white;
+    opacity: 0.5;
+}
+
+/* --- HEADER HALAMAN (Breadcrumb) --- */
+.page-header-bar {
+    background-color: #e9ecef;
+    padding: 15px 20px;
+    border-radius: 8px;
+    border-left: 5px solid #2d8bba;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* --- UTILITIES LAIN --- */
+.alert-custom-red {
+    background-color: #ff3b30;
+}
+
+/* --- FOOTER --- */
+footer {
+    background-color: var(--primary-blue);
+    color: white;
+    padding: 25px 0;
+    margin-top: auto;
+}
+
+.social-icon {
+    color: white;
+    font-size: 1.5rem;
+    margin: 0 10px;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.social-icon:hover {
+    color: var(--primary-yellow);
+    transform: translateY(-3px);
+}
+
+/* --- SIDEBAR MENU --- */
+.sidebar-list a {
+    background-color: #e9ecef;
+    color: #333;
+    margin-bottom: 4px;
+    border: none;
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.sidebar-list a.active {
+    background-color: #1a8392; 
+    color: white;
+}
