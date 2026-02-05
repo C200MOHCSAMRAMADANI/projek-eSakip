@@ -2,147 +2,8 @@
 
 // Template HTML untuk setiap halaman
 const pages = {
-    dashboard: `
-        <div class="hero-section">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-md-6 hero-text-wrapper">
-                        <h3 class="fw-bold mb-3">Transformasi Digital dan Pelayanan Publik Kabupaten Gunungkidul</h3>
-                        <p>Platform terpadu yang menyinergikan tata kelola pemerintahan cerdas, ekonomi, lingkungan, dan kehidupan sosial. Dirancang untuk meningkatkan kualitas hidup masyarakat Gunungkidul melalui optimalisasi teknologi dan potensi daerah.</p>
-                    </div>
-                    <div class="col-md-6 text-end">
-                        <img src="/assets/gunungkidul.png" alt="Gunungkidul" class="hero-img-custom">
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="container dashboard-cards-overlap">
-            <div class="row g-4 justify-content-center">
-                
-                <div class="col-md-3">
-                    <div class="card-menu">
-                        <div>
-                            <i class="fas fa-university fa-3x mb-3 text-secondary"></i>
-                            <p class="small text-muted">Dokumen perencanaan yang meliputi RPJMD, Renstra, dll.</p>
-                        </div>
-                        <button class="btn-grey-custom" onclick="loadPage('perencanaan')">PERENCANAAN</button>
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <div class="card-menu">
-                        <div>
-                            <i class="fas fa-file-signature fa-3x mb-3 text-primary"></i>
-                            <p class="small text-muted">Dokumen yang memastikan kemajuan pencapaian target.</p>
-                        </div>
-                        <button class="btn-grey-custom" onclick="loadPage('pengukuran')">PENGUKURAN</button>
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <div class="card-menu">
-                        <div>
-                            <i class="fas fa-file-alt fa-3x mb-3 text-warning"></i>
-                            <p class="small text-muted">Laporan pencapaian kinerja Pemerintah Daerah.</p>
-                        </div>
-                        <button class="btn-grey-custom" onclick="loadPage('pelaporan')">PELAPORAN</button>
-                    </div>
-                </div>
-
-                <div class="col-md-3">
-                    <div class="card-menu">
-                        <div>
-                            <i class="fas fa-clipboard-check fa-3x mb-3 text-info"></i>
-                            <p class="small text-muted">Laporan hasil evaluasi kinerja.</p>
-                        </div>
-                        <button class="btn-grey-custom" onclick="loadPage('evaluasi')">EVALUASI</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row justify-content-center mt-5 mb-5">
-                <div class="col-md-3">
-                     <div class="card-menu">
-                        <div>
-                            <i class="fas fa-trophy text-warning mb-3 fa-3x"></i>
-                            <p class="small text-muted">Berbagai penghargaan dan capaian kinerja membanggakan yang telah diraih.</p>
-                        </div>
-                        <button class="btn-grey-custom" onclick="loadPage('prestasi')">PRESTASI</button>
-                     </div>
-                </div>
-            </div>
-            
-        </div> 
-
-        <div class="priority-section">
-            <div class="container text-center">
-                
-                <h4 class="fw-bold mb-3">PRIORITAS PEMBANGUNAN</h4>
-                <hr class="priority-divider">
-                <p class="mb-5">Berikut ini merupakan prioritas pembangunan berdasarkan RB tematik agar kinerja Pemerintah lebih berdampak langsung kepada masyarakat.</p>
-                
-                <div class="row justify-content-center g-4">
-                    <div class="col-6 col-md-3">
-                        <div class="p-3 border-0 rounded-4 bg-white shadow-sm h-100">
-                            <i class="fas fa-users fa-3x mb-3 text-dark"></i>
-                            <h6 class="fw-bold m-0 text-uppercase text-dark">KEMISKINAN</h6>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                         <div class="p-3 border-0 rounded-4 bg-white shadow-sm h-100">
-                            <i class="fas fa-chart-pie fa-3x mb-3 text-warning"></i>
-                            <h6 class="fw-bold m-0 text-uppercase text-dark">INVESTASI</h6>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                         <div class="p-3 border-0 rounded-4 bg-white shadow-sm h-100">
-                            <i class="fas fa-mobile-alt fa-3x mb-3 text-primary"></i>
-                            <h6 class="fw-bold m-0 text-uppercase text-dark">DIGITALISASI</h6>
-                        </div>
-                    </div>
-                    <div class="col-6 col-md-3">
-                         <div class="p-3 border-0 rounded-4 bg-white shadow-sm h-100">
-                            <i class="fas fa-chart-line fa-3x mb-3 text-success"></i>
-                            <h6 class="fw-bold m-0 text-uppercase text-dark">PDN</h6>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    `,
-    perencanaan: `
-        <div class="container mt-5 mb-5">
-            <div class="page-header-bar">
-                <i class="fas fa-sliders-h"></i> Perencanaan Kinerja - RENSTRA
-            </div>
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="list-group sidebar-list">
-                        <a href="#" class="list-group-item list-group-item-action active">Rencana Strategis <i class="fas fa-arrow-right"></i></a>
-                        <a href="#" class="list-group-item list-group-item-action">Rencana Kerja <i class="fas fa-arrow-right"></i></a>
-                        <a href="#" class="list-group-item list-group-item-action">Rencana Aksi <i class="fas fa-arrow-right"></i></a>
-                        <a href="#" class="list-group-item list-group-item-action">Perjanjian Kinerja <i class="fas fa-arrow-right"></i></a>
-                    </div>
-                </div>
-                <div class="col-md-9">
-                    <div class="page-header-bar py-2 bg-light border-0">
-                        <i class="fas fa-sliders-h"></i> Dokumen Sakip Kabupaten Tahun 2026
-                    </div>
-                    <table class="table table-bordered table-striped">
-                        <thead class="table-light fw-bold">
-                            <tr><th width="50">NO</th><th>JENIS DOKUMEN</th></tr>
-                        </thead>
-                        <tbody>
-                            <tr><td>1</td><td class="d-flex justify-content-between">Dokumen Renstra Bappeda <i class="fas fa-download"></i></td></tr>
-                            <tr><td>2</td><td class="d-flex justify-content-between">Dokumen Renstra Dinas Kesehatan <i class="fas fa-download"></i></td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    `,
+    // Hapus konten dashboard dan perencanaan yang sudah dipindah ke Blade
+    // agar sistem memaksa load dari server.
     pengukuran: `
         <div class="container mt-5">
             <div class="page-header-bar">
@@ -231,25 +92,100 @@ const pages = {
                 <h5>LAYANAN INFORMASI, KONSULTASI DAN PENGADUAN</h5>
                 <hr>
                 <p class="fw-bold mt-4">BAGIAN ORGANISASI SEKRETARIAT DAERAH</p>
-                <p><i class="fab fa-whatsapp text-success fa-lg me-2"></i> WhatsApp : +62 878 3936 5687</p>
-                <p><i class="fas fa-envelope text-danger fa-lg me-2"></i> Email : subkrokskinerja@gmail.com</p>
+                <p><i class="fas fa-map-marker-alt text-primary fa-lg me-2"></i> Alamat : <a href="https://maps.app.goo.gl/dLxyUWFGbjjeYXTF6" target="_blank" class="text-decoration-none text-primary">Jl. Brigjen Katamso No. 1, Wonosari, Gunungkidul</a></p>
+                <p><i class="fab fa-whatsapp text-success fa-lg me-2"></i> WhatsApp : <a href="https://wa.me/6287839365687?text=Halo%2C%20saya%20ingin%20konsultasi%20terkait%20SAKIP" target="_blank" class="text-decoration-none text-primary">+62 878 3936 5687</a></p>
+                <p><i class="fas fa-envelope text-danger fa-lg me-2"></i> Email : <a href="mailto:subkrokskinerja@gmail.com" class="text-decoration-none text-primary">subkrokskinerja@gmail.com</a></p>
             </div>
         </div>
     `
 };
 
+// Fungsi global untuk interaksi Sidebar (dipindahkan dari Blade)
+window.updateContent = function(element, title, colHeader) {
+    // 1. Hapus class active dari semua item sidebar
+    document.querySelectorAll('.sidebar-custom .list-group-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    
+    // 2. Tambahkan class active ke elemen yang diklik
+    element.classList.add('active');
+    
+    // 3. Update Judul Header Utama
+    const mainTitle = document.getElementById('main-page-title');
+    if(mainTitle) mainTitle.innerText = 'Perencanaan Kinerja - ' + title.toUpperCase();
+    
+    // 4. Update Header Kolom Tabel
+    const colHeaderEl = document.getElementById('dynamic-col-header');
+    if(colHeaderEl) colHeaderEl.innerText = colHeader;
+}
+
+// Fungsi inisialisasi khusus halaman Perencanaan
+window.initPerencanaan = function() {
+    const filter = document.getElementById('filter-tahun');
+    const tbody = document.getElementById('dokumen-table-body');
+
+    if (filter && tbody) {
+        // Event Listener saat tahun berubah
+        filter.addEventListener('change', function() {
+            fetchDokumen(this.value);
+        });
+
+        // Load data awal (sesuai nilai default select, misal 2026)
+        fetchDokumen(filter.value);
+    }
+}
+
+// Fungsi Fetch Data API
+window.fetchDokumen = function(tahun) {
+    const tbody = document.getElementById('dokumen-table-body');
+    tbody.innerHTML = '<tr><td colspan="2" class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary" role="status"></div> Loading...</td></tr>';
+
+    fetch(`/api/dokumen-sakip?tahun=${tahun}`)
+        .then(res => res.json())
+        .then(response => {
+            let rows = '';
+            if(response.data && response.data.length > 0) {
+                response.data.forEach(item => {
+                    rows += `<tr><td class="text-center">${item.no}</td><td class="d-flex justify-content-between align-items-center"><span>${item.nama}</span><button class="btn btn-sm btn-download-custom rounded-pill px-3"><i class="fas fa-file-pdf me-1"></i> Unduh</button></td></tr>`;
+                });
+            } else {
+                rows = '<tr><td colspan="2" class="text-center py-3">Tidak ada dokumen untuk tahun ini.</td></tr>';
+            }
+            tbody.innerHTML = rows;
+        })
+        .catch(err => {
+            console.error(err);
+            tbody.innerHTML = '<tr><td colspan="2" class="text-center text-danger py-3">Gagal memuat data.</td></tr>';
+        });
+}
+
 function loadPage(pageName) {
     const contentDiv = document.getElementById('main-content');
     contentDiv.innerHTML = '<div class="text-center mt-5"><div class="spinner-border text-primary" role="status"></div></div>';
     
-    // Simulasi delay agar terasa seperti loading
-    setTimeout(() => {
-        if (pages[pageName]) {
-            contentDiv.innerHTML = pages[pageName];
-        } else {
-            contentDiv.innerHTML = '<h2 class="text-center mt-5">404 Halaman Tidak Ditemukan</h2>';
-        }
-    }, 200);
+    // Coba ambil konten dari server (Blade View)
+    // Pastikan Route '/page/{page}' sudah dibuat di routes/web.php
+    fetch(`/page/${pageName}`)
+        .then(response => {
+            if (!response.ok) throw new Error('Page not found on server');
+            return response.text();
+        })
+        .then(html => {
+            contentDiv.innerHTML = html;
+            // Jalankan script inisialisasi jika halaman adalah perencanaan
+            if (pageName === 'perencanaan') {
+                initPerencanaan();
+            }
+        })
+        .catch(error => {
+            console.log("Fallback to static content:", error);
+            // Fallback ke konten statis JS jika server gagal/404
+            if (pages[pageName]) {
+                contentDiv.innerHTML = pages[pageName];
+            } else {
+                contentDiv.innerHTML = '<h2 class="text-center mt-5">404 Halaman Tidak Ditemukan</h2>';
+            }
+        });
 }
 
 // Load Dashboard saat pertama kali dibuka

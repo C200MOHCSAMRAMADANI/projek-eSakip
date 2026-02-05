@@ -3,6 +3,8 @@
     --primary-blue: #0e5b8e;
     --primary-yellow: #fecb00;
     --bg-light: #f4f7fa;
+    --sakip-teal: #1a8392;
+    --sakip-bg-grey: #e8e8e8;
 }
 
 body {
@@ -21,6 +23,11 @@ body {
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     /* Transisi halus untuk efek scroll */
     transition: all 0.4s ease-in-out;
+}
+
+/* Pastikan icon hamburger berwarna Putih saat navbar Biru (default) */
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
 }
 
 .navbar-brand {
@@ -84,9 +91,11 @@ body {
     color: var(--primary-yellow) !important;
 }
 
-/* Ubah icon hamburger (mobile) jadi hitam/gelap saat background putih */
+/* Ubah icon hamburger (mobile) jadi Biru saat background putih */
 .navbar-scrolled .navbar-toggler-icon {
-    filter: invert(1); 
+    /* Menggunakan SVG icon dengan stroke warna Primary Blue (#0e5b8e) */
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%230e5b8e' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+    filter: none; 
 }
 .navbar-scrolled .navbar-toggler {
     border-color: rgba(0,0,0,0.1);
@@ -190,10 +199,10 @@ body {
 
 /* --- HEADER HALAMAN (Breadcrumb) --- */
 .page-header-bar {
-    background-color: #e9ecef;
+    background-color: var(--sakip-bg-grey);
     padding: 15px 20px;
     border-radius: 8px;
-    border-left: 5px solid #2d8bba;
+    border-left: 6px solid var(--sakip-teal);
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -240,4 +249,100 @@ footer {
 .sidebar-list a.active {
     background-color: #1a8392; 
     color: white;
+}
+
+/* --- SIDEBAR CUSTOM (Perencanaan) --- */
+.sidebar-custom {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.sidebar-custom .list-group-item {
+    background-color: #f0f0f0;
+    color: #333;
+    border: none;
+    border-bottom: 1px solid #ddd;
+    font-weight: 500;
+    padding: 12px 20px;
+    transition: all 0.2s ease;
+}
+
+.sidebar-custom .list-group-item:last-child {
+    border-bottom: none;
+}
+
+.sidebar-custom .list-group-item:hover {
+    background-color: #e2e2e2;
+    padding-left: 25px; /* Efek geser sedikit saat hover */
+}
+
+.sidebar-custom .list-group-item.active {
+    background-color: var(--sakip-teal);
+    color: white;
+    border-color: var(--sakip-teal);
+}
+
+/* --- KONTEN PERENCANAAN (Filter & Tabel) --- */
+
+/* 1. Wrapper Filter agar sejajar dan rapi */
+.filter-section {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Jarak antara label dan dropdown */
+    margin-bottom: 25px; /* Jarak ke tabel di bawahnya */
+    padding: 15px 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05); /* Efek timbul halus */
+}
+
+.filter-section label {
+    margin-bottom: 0;
+    font-weight: 600;
+    color: var(--primary-blue);
+    white-space: nowrap; /* Mencegah teks turun baris */
+}
+
+.filter-section .form-select {
+    max-width: 200px; /* Batasi lebar dropdown */
+    border-radius: 50px; /* Style rounded pill */
+    border: 1px solid #e0e0e0;
+    padding-left: 15px;
+}
+
+.filter-section .form-select:focus {
+    border-color: var(--sakip-teal);
+    box-shadow: 0 0 0 0.2rem rgba(26, 131, 146, 0.25);
+}
+
+/* 2. Tombol Download Custom (Konsisten & Hover Effect) */
+.btn-download-custom {
+    background-color: var(--sakip-teal);
+    color: white !important;
+    border: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px; /* Jarak icon dan teks */
+    cursor: pointer;
+    white-space: nowrap; /* Mencegah teks turun baris di layar kecil */
+}
+
+.btn-download-custom:hover {
+    background-color: var(--primary-blue);
+    transform: translateY(-2px); /* Efek naik sedikit saat hover */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* 3. Tabel Responsif Wrapper */
+.table-responsive-custom {
+    display: block;
+    width: 100%;
+    overflow-x: auto; /* Scroll samping jika layar kecil */
+    -webkit-overflow-scrolling: touch;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }

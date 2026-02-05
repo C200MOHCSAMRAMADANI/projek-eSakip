@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>eSakip Kabupaten Gunungkidul</title>
+    <title>eSakip</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -51,13 +51,14 @@
 
     <footer>
         <div class="container text-center">
+            <p class="mb-0 fw-bold">Dikembangkan Oleh Diskominfo Kabupaten Gunungkidul.</p>
+            <hr class="my-2">
             <div class="mb-3">
                 <a href="https://x.com/kominfogk" target="_blank" class="social-icon"><i class="fab fa-twitter"></i></a>
                 <a href="https://www.facebook.com/share/17fyN7eJd4/" target="_blank" class="social-icon"><i class="fab fa-facebook-f"></i></a>
                 <a href="https://www.instagram.com/kominfogunungkidul?igsh=dTd6aGZ2NTRzbzM2" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>
                 <a href="https://youtube.com/@kominfogunungkidul?si=R5Js1T-NZIYFALIz" target="_blank" class="social-icon"><i class="fab fa-youtube"></i></a>
             </div>
-            <p class="mb-0 fw-bold">Dikembangkan oleh Diskominfo Kabupaten Gunungkidul.</p>
         </div>
     </footer>
 

@@ -13,6 +13,11 @@ class ContentController extends Controller
             return view("pages.{$page}");
         }
         
+        // Cek juga di root resources/views/ (jika file tidak di dalam folder pages)
+        if (view()->exists($page)) {
+            return view($page);
+        }
+        
         return response('Halaman tidak ditemukan', 404);
     }
 }
