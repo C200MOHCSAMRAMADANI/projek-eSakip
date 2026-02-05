@@ -23,6 +23,8 @@ body {
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     /* Transisi halus untuk efek scroll */
     transition: all 0.4s ease-in-out;
+    /* FIX: Pastikan navbar memiliki z-index tinggi agar tidak tertutup hero section */
+    z-index: 1050;
 }
 
 /* Pastikan icon hamburger berwarna Putih saat navbar Biru (default) */

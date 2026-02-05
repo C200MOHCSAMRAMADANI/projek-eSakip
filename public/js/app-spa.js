@@ -4,23 +4,6 @@
 const pages = {
     // Hapus konten dashboard dan perencanaan yang sudah dipindah ke Blade
     // agar sistem memaksa load dari server.
-    pengukuran: `
-        <div class="container mt-5">
-            <div class="page-header-bar">
-                <i class="fas fa-sliders-h"></i> Pengukuran Kinerja
-            </div>
-            <div class="card p-4 border-0 shadow-sm">
-                <h5 class="mb-3">Pengukuran Kinerja IKU Perangkat Daerah</h5>
-                <table class="table table-bordered table-striped">
-                    <thead><tr><th>NO</th><th>PERANGKAT DAERAH</th><th class="text-center">AKSI</th></tr></thead>
-                    <tbody>
-                        <tr><td>1</td><td>Sekretariat Daerah</td><td class="text-center"><button class="btn btn-primary btn-sm">Lihat Data 2026</button></td></tr>
-                        <tr><td>2</td><td>Dinas Kominfo</td><td class="text-center"><button class="btn btn-primary btn-sm">Lihat Data 2026</button></td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    `,
     pelaporan: `
         <div class="container mt-5">
             <div class="page-header-bar">
@@ -140,7 +123,7 @@ window.fetchDokumen = function(tahun) {
     const tbody = document.getElementById('dokumen-table-body');
     tbody.innerHTML = '<tr><td colspan="2" class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary" role="status"></div> Loading...</td></tr>';
 
-    fetch(`/api/dokumen-sakip?tahun=${tahun}`)
+    fetch(`api/dokumen-sakip?tahun=${tahun}`)
         .then(res => res.json())
         .then(response => {
             let rows = '';
@@ -160,12 +143,20 @@ window.fetchDokumen = function(tahun) {
 }
 
 function loadPage(pageName) {
+    // 1. Cek Hash URL
+    // Jika hash di URL berbeda dengan page yang diminta, update hashnya.
+    // Ini akan memicu event 'hashchange' (di bawah) yang kemudian akan memanggil loadPage lagi.
+    if (window.location.hash.substring(1) !== pageName) {
+        window.location.hash = pageName;
+        return; // Berhenti di sini, biarkan event listener hashchange yang memuat konten
+    }
+
     const contentDiv = document.getElementById('main-content');
     contentDiv.innerHTML = '<div class="text-center mt-5"><div class="spinner-border text-primary" role="status"></div></div>';
     
     // Coba ambil konten dari server (Blade View)
     // Pastikan Route '/page/{page}' sudah dibuat di routes/web.php
-    fetch(`/page/${pageName}`)
+    fetch(`page/${pageName}`)
         .then(response => {
             if (!response.ok) throw new Error('Page not found on server');
             return response.text();
@@ -188,7 +179,27 @@ function loadPage(pageName) {
         });
 }
 
-// Load Dashboard saat pertama kali dibuka
+// 2. Event Listener untuk Navigasi (Back/Forward Browser & Perubahan Hash)
+window.addEventListener('hashchange', function() {
+    const page = window.location.hash.substring(1);
+    // Jika hash kosong, load dashboard, jika tidak load page sesuai hash
+    loadPage(page || 'dashboard');
+});
+
+// 3. Load Halaman saat pertama kali dibuka (Reload)
 document.addEventListener("DOMContentLoaded", function() {
-    loadPage('dashboard');
+    // FIX: Otomatis ubah link navbar yang pakai onclick="loadPage(...)" menjadi href="#..."
+    // Ini mencegah konflik tombol kembali ke dashboard karena href="#"
+    document.querySelectorAll('a[onclick*="loadPage"]').forEach(anchor => {
+        const match = anchor.getAttribute('onclick').match(/loadPage\(['"]([^'"]+)['"]\)/);
+        if (match && match[1]) {
+            anchor.setAttribute('href', '#' + match[1]);
+            anchor.removeAttribute('onclick');
+        }
+    });
+
+    // Cek apakah ada hash di URL (misal #perencanaan)
+    const page = window.location.hash.substring(1);
+    // Jika ada hash load page tersebut, jika tidak load dashboard
+    loadPage(page || 'dashboard');
 });
