@@ -96,13 +96,19 @@
                                 <tr>
                                     <th width="5%">NO</th>
                                     <th class="text-start">NAMA PERANGKAT DAERAH</th>
-                                    <th width="20%" id="dynamic-col-header" class="bg-warning-subtle">RENSTRA</th>
+                                    <th width="30%" id="dynamic-col-header" class="bg-warning-subtle">RENSTRA</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr><td class="text-center">1</td><td>Sekretariat Daerah</td><td class="text-center"><span class="badge bg-secondary">Belum Upload</span></td></tr>
-                                <tr><td class="text-center">2</td><td>Inspektorat Daerah</td><td class="text-center"><button class="btn btn-sm btn-success rounded-pill px-3"><i class="fas fa-download"></i> Unduh</button></td></tr>
-                                <tr><td class="text-center">3</td><td>Dinas Komunikasi dan Informatika</td><td class="text-center"><button class="btn btn-sm btn-success rounded-pill px-3"><i class="fas fa-download"></i> Unduh</button></td></tr>
+                                <tr><td class="text-center">2</td><td>Inspektorat Daerah</td><td class="text-center">
+                                    <button class="btn btn-sm btn-success rounded-pill px-3 me-1"><i class="fas fa-download"></i> Unduh</button>
+                                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3"><i class="fas fa-link"></i> Salin Link</button>
+                                </td></tr>
+                                <tr><td class="text-center">3</td><td>Dinas Komunikasi dan Informatika</td><td class="text-center">
+                                    <button class="btn btn-sm btn-success rounded-pill px-3 me-1"><i class="fas fa-download"></i> Unduh</button>
+                                    <button class="btn btn-sm btn-outline-primary rounded-pill px-3"><i class="fas fa-link"></i> Salin Link</button>
+                                </td></tr>
                             </tbody>
                         </table>
                     </div>
