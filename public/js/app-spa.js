@@ -65,6 +65,28 @@ window.fetchDokumen = function(tahun) {
         });
 }
 
+// Fungsi untuk menampilkan Modal Preview PDF
+window.viewPdf = function(title, url) {
+    const modalEl = document.getElementById('pdfPreviewModal');
+    if (modalEl) {
+        // Update Judul
+        const modalTitle = document.getElementById('pdfPreviewTitle');
+        if (modalTitle) modalTitle.innerText = 'Pratinjau - ' + title;
+
+        // Update Iframe
+        const iframe = document.getElementById('pdfViewerFrame');
+        if (iframe) iframe.src = url;
+
+        // Update Tombol Download
+        const btnDownload = document.getElementById('btnDownloadPdf');
+        if (btnDownload) btnDownload.href = url;
+
+        // Tampilkan Modal
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
+    }
+}
+
 function loadPage(pageName) {
     // 1. Cek Hash URL
     // Jika hash di URL berbeda dengan page yang diminta, update hashnya.

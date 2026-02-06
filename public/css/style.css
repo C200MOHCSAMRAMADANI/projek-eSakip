@@ -90,7 +90,7 @@ body {
 
 /* Hover menu tetap Kuning */
 .navbar-scrolled .nav-link:hover {
-    color: var(--primary-yellow) !important;
+    color: #ffcc00 !important; /* Kuning lebih gelap saat navbar putih */
 }
 
 /* Ubah icon hamburger (mobile) jadi Biru saat background putih */
@@ -347,4 +347,108 @@ footer {
     border-radius: 8px;
     background: white;
     box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+/* --- PDF PREVIEW MODAL --- */
+.pdf-modal-body {
+    height: 80vh; /* Tinggi default untuk desktop */
+    overflow: hidden;
+}
+
+@media (max-width: 767.98px) {
+    .pdf-modal-body {
+        height: 100%; /* Mengisi penuh area modal saat mode fullscreen di mobile */
+        min-height: 400px; /* Jaga-jaga agar tidak terlalu pendek */
+    }
+}
+
+/* --- CONTACT SECTION --- */
+.contact-section {
+    background-color: #ffffff;
+    padding: 80px 0;
+    position: relative;
+    z-index: 10;
+}
+
+.contact-title {
+    font-weight: 700;
+    color: var(--primary-blue);
+    margin-bottom: 1.5rem;
+    position: relative;
+    display: inline-block;
+}
+
+.contact-title::after {
+    content: '';
+    position: absolute;
+    width: 50px;
+    height: 3px;
+    background-color: var(--primary-yellow);
+    bottom: -10px;
+    left: 0;
+}
+
+.contact-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
+    text-decoration: none;
+    color: #333;
+    border: 1px solid #eee;
+}
+
+.contact-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-yellow);
+    color: var(--primary-blue);
+}
+
+.contact-icon-box {
+    width: 50px;
+    height: 50px;
+    background: var(--bg-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--primary-blue);
+    margin-right: 15px;
+    transition: all 0.3s ease;
+}
+
+.contact-card:hover .contact-icon-box {
+    background: var(--primary-blue);
+    color: var(--primary-yellow);
+}
+
+.map-frame {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    height: 100%;
+    min-height: 350px;
+}
+
+/* --- CONTACT PAGE MAP RESPONSIVE --- */
+.contact-map-wrapper {
+    height: 400px; /* Default Desktop */
+}
+
+@media (max-width: 767.98px) {
+    .contact-map-wrapper {
+        height: 300px; /* Tinggi peta di perangkat mobile agar tidak terlalu panjang */
+    }
+}
+
+/* Utility untuk Input Search di Mobile */
+@media (max-width: 767.98px) {
+    .w-100-mobile {
+        width: 100% !important;
+    }
 }
