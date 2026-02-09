@@ -13,3 +13,12 @@ Route::get('/page/{page}', [ContentController::class, 'getPage']);
 
 // Route API untuk filter dokumen
 Route::get('/api/dokumen-sakip', [SpaController::class, 'getDokumen']);
+
+// Route API untuk detail pengukuran (Modal)
+Route::get('/api/pengukuran-detail', [ContentController::class, 'getPengukuranDetail']);
+
+// Route API untuk grafik IKU Kabupaten
+Route::get('/api/iku-kabupaten', [ContentController::class, 'getIkuKabupaten']);
+
+// Route API untuk data evaluasi
+Route::get('/api/evaluasi-data', [ContentController::class, 'getEvaluasiData']);
