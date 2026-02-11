@@ -137,6 +137,9 @@ window.initPerencanaan = function() {
         // Load data awal (sesuai nilai default select, misal 2026)
         fetchDokumen(filter.value);
     }
+
+    // Aktifkan Pagination & Search Realtime untuk Tabel Perangkat Daerah
+    window.setupTablePagination('pd-table-body', 'search-pd', 'show-entries-pd', 'pagination-pd', 'pagination-info-pd');
 }
 
 // Fungsi inisialisasi khusus halaman Pengukuran
@@ -223,6 +226,12 @@ window.fetchDokumen = function(tahun) {
     const tbody = document.getElementById('dokumen-table-body');
     tbody.innerHTML = '<tr><td colspan="2" class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary" role="status"></div> Loading...</td></tr>';
 
+    // Update Label Tahun di Header Tabel secara dinamis
+    const labelTahun = document.getElementById('label-tahun-dokumen');
+    if (labelTahun) {
+        labelTahun.innerText = tahun;
+    }
+
     fetch(`api/dokumen-sakip?tahun=${tahun}`)
         .then(res => res.json())
         .then(response => {
@@ -246,8 +255,8 @@ window.fetchDokumen = function(tahun) {
 window.fetchEvaluasiData = function(pdName, tahun) {
     const tbody = document.getElementById('evaluasi-table-body');
     if (!tbody) return;
-
-    tbody.innerHTML = '<tr><td colspan="7" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div> Loading...</td></tr>';
+ 
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div> Loading...</td></tr>';
 
     const url = `api/evaluasi-data?pd_name=${encodeURIComponent(pdName)}&tahun=${tahun}`;
 
@@ -267,15 +276,13 @@ window.fetchEvaluasiData = function(pdName, tahun) {
                             <div class="fw-bold">${item.judul || '-'}</div>
                             <small class="text-muted">${item.lhe_nama_file || ''}</small>
                         </td>
-                        <td class="text-center fw-bold">${item.nilai || '-'}</td>
-                        <td class="text-center"><span class="badge bg-primary">${item.predikat || '-'}</span></td>
                         <td class="text-center">
                             <button class="btn btn-sm btn-info text-white rounded-pill px-3" onclick="viewPdf('${item.judul}', '${fileUrl}')"><i class="fas fa-eye me-1"></i> Lihat</button>
                         </td>
                     </tr>`;
                 });
             } else {
-                rows = '<tr><td colspan="7" class="text-center py-4">Data evaluasi tidak ditemukan.</td></tr>';
+                rows = '<tr><td colspan="5" class="text-center py-4">Data evaluasi tidak ditemukan.</td></tr>';
             }
             tbody.innerHTML = rows;
 
@@ -287,7 +294,7 @@ window.fetchEvaluasiData = function(pdName, tahun) {
         })
         .catch(err => {
             console.error(err);
-            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-danger py-4">Gagal memuat data evaluasi.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">Gagal memuat data evaluasi.</td></tr>';
         });
 }
 

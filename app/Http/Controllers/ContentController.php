@@ -16,6 +16,7 @@ class ContentController extends Controller
             case 'pelaporan':
             case 'evaluasi':
             case 'pengukuran': // Asumsi pengukuran juga pakai list yang sama
+            case 'perencanaan': // Tambahkan perencanaan agar mendapat data pd_list
                 // Daftar Perangkat Daerah (Sesuai Permintaan)
                 // MENGAMBIL DARI DATABASE TABEL USER
                 $data['pd_list'] = DB::table('user')->orderBy('nama_satker', 'asc')->pluck('nama_satker');
@@ -69,7 +70,6 @@ class ContentController extends Controller
     {
         $pdName = $request->query('pd_name');
         $tahun = $request->query('tahun');
-        
         // 1. Cari ID OPD berdasarkan Nama Satker di tabel user
         // Asumsi: Nama di tabel user (nama_satker) sesuai dengan parameter yang dikirim
         $user = DB::table('user')->where('nama_satker', $pdName)->first();

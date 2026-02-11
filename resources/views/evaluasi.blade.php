@@ -41,10 +41,8 @@
                         <tr>
                             <th width="5%">NO</th>
                             <th width="10%">TAHUN</th>
-                            <th class="text-start">NAMA PERANGKAT DAERAH</th>
+                            <th class="text-start">NAMA PERANGKAT D AERAH</th>
                             <th>JUDUL / FILE</th>
-                            <th width="10%">NILAI</th>
-                            <th width="10%">PREDIKAT</th>
                             <th width="10%">AKSI</th>
                         </tr>
                     </thead>

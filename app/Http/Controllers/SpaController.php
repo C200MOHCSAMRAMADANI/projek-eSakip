@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\DB;
 
 class SpaController extends Controller
 {
@@ -22,19 +23,18 @@ class SpaController extends Controller
     {
         // Ambil parameter tahun, default ke 2026
         $tahun = $request->query('tahun', '2026');
-        $data = [];
-
-        if ($tahun == '2026') {
-            $data = [
-                ['no' => 1, 'nama' => 'Dokumen Renstra Bappeda', 'download' => '#'],
-                ['no' => 2, 'nama' => 'Dokumen Renstra Dinkes', 'download' => '#'],
-            ];
-        } elseif ($tahun == '2025') {
-            $data = [
-                ['no' => 1, 'nama' => 'Laporan Kinerja 2025', 'download' => '#'],
-                ['no' => 2, 'nama' => 'Evaluasi Sakip 2025', 'download' => '#'],
-            ];
-        }
+        
+        // Data dummy statis untuk Perencanaan (Jenis Dokumen)
+        $data = [
+            ['no' => 1, 'nama' => 'RPJPD', 'download' => '#'],
+            ['no' => 2, 'nama' => 'RPJMD', 'download' => '#'],
+            ['no' => 3, 'nama' => 'RKPD', 'download' => '#'],
+            ['no' => 4, 'nama' => 'IKU BUPATI', 'download' => '#'],
+            ['no' => 5, 'nama' => 'LKJIP BUPATI', 'download' => '#'],
+            ['no' => 6, 'nama' => 'Perjanjian Kinerja Bupati', 'download' => '#'],
+            ['no' => 7, 'nama' => 'LHE AKIP', 'download' => '#'],
+            ['no' => 8, 'nama' => 'Cascading IKU', 'download' => '#'],
+        ];
 
         return response()->json(['data' => $data]);
     }

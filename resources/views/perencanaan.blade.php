@@ -11,9 +11,9 @@
         <div class="d-flex flex-wrap align-items-center justify-content-center bg-white p-2 rounded shadow-sm border">
             <label class="me-2 fw-bold text-secondary">Filter Tahun :</label>
             <select id="filter-tahun" class="form-select form-select-sm w-auto border-secondary fw-bold text-center" style="min-width: 100px;">
-                <option selected>2026</option>
-                <option>2025</option>
-                <option>2024</option>
+                @for ($i = 2026; $i >= 2018; $i--)
+                    <option value="{{ $i }}" {{ $i == 2026 ? 'selected' : '' }}>{{ $i }}</option>
+                @endfor
             </select>
         </div>
     </div>
@@ -21,7 +21,7 @@
     <!-- Tabel 1: Dokumen Kabupaten (Dipindah ke atas, Full Width) -->
     <div class="card border-0 shadow-sm mb-4 rounded-3 overflow-hidden">
         <div class="card-header bg-white py-3">
-            <h6 class="fw-bold m-0 text-secondary"><i class="fas fa-file-alt me-2"></i> DOKUMEN SAKIP KABUPATEN TAHUN 2026</h6>
+            <h6 class="fw-bold m-0 text-secondary"><i class="fas fa-file-alt me-2"></i> DOKUMEN SAKIP KABUPATEN TAHUN <span id="label-tahun-dokumen">2026</span></h6>
         </div>
         <div class="table-responsive">
             <table class="table table-striped mb-0 align-middle">
@@ -82,11 +82,11 @@
                     <div class="row mb-3 g-2">
                         <div class="col-md-6 d-flex align-items-center">
                             <small class="me-2">Show</small>
-                            <select class="form-select form-select-sm w-auto"><option>10</option><option>25</option></select>
+                            <select id="show-entries-pd" class="form-select form-select-sm w-auto"><option value="10">10</option><option value="25">25</option><option value="50">50</option></select>
                             <small class="ms-2">entries</small>
                         </div>
                         <div class="col-md-6 text-md-end">
-                            <label class="w-100 w-md-auto"><small class="d-md-inline d-block text-start mb-1 mb-md-0">Search:</small> <input type="search" class="form-control form-control-sm d-inline-block w-auto w-100-mobile"></label>
+                            <label class="w-100 w-md-auto"><small class="d-md-inline d-block text-start mb-1 mb-md-0">Search:</small> <input id="search-pd" type="search" class="form-control form-control-sm d-inline-block w-auto w-100-mobile" placeholder="Cari Perangkat Daerah..."></label>
                         </div>
                     </div>
 
@@ -99,22 +99,26 @@
                                     <th width="30%" id="dynamic-col-header" class="bg-warning-subtle">RENSTRA</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr><td class="text-center">1</td><td>Sekretariat Daerah</td><td class="text-center"><span class="badge bg-secondary">Belum Upload</span></td></tr>
-                                <tr><td class="text-center">2</td><td>Inspektorat Daerah</td><td class="text-center">
-                                    <button class="btn btn-sm btn-info text-white rounded-pill px-3" onclick="viewPdf('Inspektorat Daerah', 'files/sample.pdf')"><i class="fas fa-eye me-1"></i> Lihat</button>
-                                </td></tr>
-                                <tr><td class="text-center">3</td><td>Dinas Komunikasi dan Informatika</td><td class="text-center">
-                                    <button class="btn btn-sm btn-info text-white rounded-pill px-3" onclick="viewPdf('Dinas Kominfo', 'files/sample.pdf')"><i class="fas fa-eye me-1"></i> Lihat</button>
-                                </td></tr>
+                            <tbody id="pd-table-body">
+                                @if(isset($pd_list))
+                                    @foreach($pd_list as $index => $pd)
+                                    <tr>
+                                        <td class="text-center">{{ $index + 1 }}</td>
+                                        <td>{{ $pd }}</td>
+                                        <td class="text-center"><span class="badge bg-secondary">Belum Upload</span></td>
+                                    </tr>
+                                    @endforeach
+                                @else
+                                    <tr><td colspan="3" class="text-center">Data Perangkat Daerah tidak ditemukan.</td></tr>
+                                @endif
                             </tbody>
                         </table>
                     </div>
 
                     <!-- Pagination -->
                     <div class="d-flex justify-content-between align-items-center mt-3">
-                        <small class="text-muted">Showing 1 to 3 of 3 entries</small>
-                        <nav><ul class="pagination pagination-sm mb-0"><li class="page-item disabled"><a class="page-link" href="#">Previous</a></li><li class="page-item active"><a class="page-link" href="#">1</a></li><li class="page-item"><a class="page-link" href="#">Next</a></li></ul></nav>
+                        <small id="pagination-info-pd" class="text-muted"></small>
+                        <nav><ul id="pagination-pd" class="pagination pagination-sm mb-0"></ul></nav>
                     </div>
                 </div>
             </div>
