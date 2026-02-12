@@ -169,6 +169,8 @@
                             <th>FISIK</th>
                         </tr>
                     </thead>
+
+                    {{-- DATA DUMMY BAGIAN KEUANGAN --}}
                     <tbody id="table-keuangan-body">
                         @foreach($pd_list as $index => $pd)
                         <tr>

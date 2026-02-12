@@ -22,3 +22,6 @@ Route::get('/api/iku-kabupaten', [ContentController::class, 'getIkuKabupaten']);
 
 // Route API untuk data evaluasi
 Route::get('/api/evaluasi-data', [ContentController::class, 'getEvaluasiData']);
+
+// Route API untuk data pelaporan
+Route::get('/api/pelaporan-data', [ContentController::class, 'getPelaporanData']);

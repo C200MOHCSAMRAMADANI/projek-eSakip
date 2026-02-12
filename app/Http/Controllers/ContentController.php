@@ -19,7 +19,9 @@ class ContentController extends Controller
             case 'perencanaan': // Tambahkan perencanaan agar mendapat data pd_list
                 // Daftar Perangkat Daerah (Sesuai Permintaan)
                 // MENGAMBIL DARI DATABASE TABEL USER
-                $data['pd_list'] = DB::table('user')->orderBy('nama_satker', 'asc')->pluck('nama_satker');
+                $data['pd_list'] = DB::table('user')
+                    ->where('level', '!=', 'admin')
+                    ->orderBy('nama_satker', 'asc')->pluck('nama_satker');
 
                 // Ambil tahun terbaru dari database (pengukuran_iku_2023) atau tahun saat ini
                 // Ini memastikan filter dinamis mengikuti data (misal 2026) atau tahun berjalan
@@ -127,6 +129,7 @@ class ContentController extends Controller
         // Ambil data dari tabel file_evaluasi dan join dengan user untuk nama OPD
         $query = DB::table('file_evaluasi as fe')
             ->leftJoin('user as u', 'fe.id_opd', '=', 'u.id_opd')
+            ->where('u.level', '!=', 'admin')
             ->select(
                 'fe.*',
                 'u.nama_satker'
@@ -142,6 +145,35 @@ class ContentController extends Controller
 
         $query->orderBy('fe.tahun', 'desc')
               ->orderBy('fe.tgl_posting', 'desc');
+
+        return response()->json(['data' => $query->get()]);
+    }
+
+    public function getPelaporanData(Request $request)
+    {
+        $pdName = $request->query('pd_name');
+        $tahun = $request->query('tahun');
+
+        // Ambil data dari tabel file_pelaporan dan join dengan user untuk nama OPD
+        // Menggunakan pola yang sama dengan Evaluasi
+        $query = DB::table('file_pelaporan as fp')
+            ->leftJoin('user as u', 'fp.id_opd', '=', 'u.id_opd')
+            ->where('u.level', '!=', 'admin')
+            ->select(
+                'fp.*',
+                'u.nama_satker'
+            );
+
+        if ($pdName && $pdName !== 'all') {
+            $query->where('u.nama_satker', $pdName);
+        }
+
+        if ($tahun && $tahun !== 'all') {
+            $query->where('fp.tahun', $tahun);
+        }
+
+        $query->orderBy('fp.tahun', 'desc')
+              ->orderBy('fp.tgl_posting', 'desc');
 
         return response()->json(['data' => $query->get()]);
     }

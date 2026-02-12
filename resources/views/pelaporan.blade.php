@@ -11,7 +11,7 @@
     <div class="d-flex justify-content-center mb-4">
         <div class="d-flex align-items-center bg-white p-2 rounded shadow-sm border">
             <label class="me-2 fw-bold text-secondary">Filter Tahun :</label>
-            <select class="form-select form-select-sm w-auto border-secondary fw-bold text-center" style="min-width: 100px;">
+            <select id="filter-tahun-pelaporan" class="form-select form-select-sm w-auto border-secondary fw-bold text-center" style="min-width: 100px;">
                 <option selected>2026</option>
                 <option>2025</option>
                 <option>2024</option>
@@ -27,17 +27,17 @@
             <div class="row mb-3 g-2">
                 <div class="col-12 col-md-6 d-flex align-items-center justify-content-center justify-content-md-start">
                     <small class="me-2">Show</small>
-                    <select class="form-select form-select-sm w-auto">
-                        <option>10</option>
-                        <option>25</option>
-                        <option>50</option>
+                    <select id="show-entries-pelaporan" class="form-select form-select-sm w-auto">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
                     </select>
                     <small class="ms-2">entries</small>
                 </div>
                 <div class="col-12 col-md-6 text-center text-md-end">
                     <label>
                         <small>Search:</small> 
-                        <input type="search" class="form-control form-control-sm d-inline-block w-auto" placeholder="Cari Perangkat Daerah...">
+                        <input id="search-pelaporan" type="search" class="form-control form-control-sm d-inline-block w-auto" placeholder="Cari Perangkat Daerah...">
                     </label>
                 </div>
             </div>
@@ -52,16 +52,15 @@
                             <th width="15%">LKJP</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="pelaporan-table-body">
                         @foreach($pd_list ?? [] as $index => $pd)
                         <tr>
                             <td class="text-center">{{ $index + 1 }}</td>
                             <td>{{ $pd }}</td>
                             <td class="text-center">
-                                <!-- Ikon PDF Merah -->
-                                <a href="#" class="text-decoration-none" title="Unduh LKJP">
-                                    <i class="fas fa-file-pdf text-danger fa-2x"></i>
-                                </a>
+                                <button class="btn btn-sm btn-info text-white rounded-pill px-3" onclick="viewPdf('{{ $pd }}', '{{ asset('files/DUMMY.pdf') }}')">
+                                    <i class="fas fa-eye me-1"></i> Lihat
+                                </button>
                             </td>
                         </tr>
                         @endforeach
@@ -71,17 +70,31 @@
 
             <!-- Pagination -->
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-3 gap-2">
-                <small class="text-muted">Showing 1 to {{ count($pd_list) }} of {{ count($pd_list) }} entries</small>
+                <small id="pagination-info-pelaporan" class="text-muted"></small>
                 <nav>
-                    <ul class="pagination pagination-sm mb-0">
-                        <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
-                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                        <li class="page-item"><a class="page-link" href="#">2</a></li>
-                        <li class="page-item"><a class="page-link" href="#">Next</a></li>
-                    </ul>
+                    <ul id="pagination-pelaporan" class="pagination pagination-sm mb-0"></ul>
                 </nav>
             </div>
 
+        </div>
+    </div>
+
+    <!-- Modal Preview PDF -->
+    <div class="modal fade" id="pdfPreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable modal-fullscreen-md-down">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="pdfPreviewTitle">Pratinjau Dokumen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0 pdf-modal-body">
+                    <iframe id="pdfViewerFrame" src="" width="100%" height="100%" style="border:none;"></iframe>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <a href="#" id="btnDownloadPdf" class="btn btn-success" target="_blank" download><i class="fas fa-download me-1"></i> Unduh Dokumen</a>
+                </div>
+            </div>
         </div>
     </div>
 </div>

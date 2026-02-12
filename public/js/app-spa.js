@@ -3,6 +3,7 @@
 // Variabel global untuk instance Chart.js
 window.ikuChartInstance = null;
 window.currentPdEvaluasi = 'all'; // State untuk menyimpan PD yang dipilih di halaman Evaluasi
+window.currentPdPelaporan = 'all'; // State untuk menyimpan PD yang dipilih di halaman Pelaporan
 
 // Template HTML untuk setiap halaman
 const pages = {
@@ -29,6 +30,11 @@ window.updateContent = function(element, title, colHeader) {
         window.currentPdEvaluasi = title;
         const year = document.getElementById('filter-tahun-evaluasi')?.value || 'all';
         fetchEvaluasiData(title, year);
+    } else if (pageHash === 'pelaporan') {
+        if(mainTitle) mainTitle.innerText = 'Pelaporan Kinerja - ' + title.toUpperCase();
+        window.currentPdPelaporan = title;
+        const year = document.getElementById('filter-tahun-pelaporan')?.value || 'all';
+        fetchPelaporanData(title, year);
     } else {
         // Default (Perencanaan)
         if(mainTitle) mainTitle.innerText = 'Perencanaan Kinerja - ' + title.toUpperCase();
@@ -221,6 +227,25 @@ window.initEvaluasi = function() {
     }
 }
 
+// Fungsi inisialisasi khusus halaman Pelaporan
+window.initPelaporan = function() {
+    const filter = document.getElementById('filter-tahun-pelaporan');
+    
+    if (filter) {
+        filter.addEventListener('change', function() {
+            // Nonaktifkan fetch API agar tidak menimpa tabel Blade
+            // fetchPelaporanData(window.currentPdPelaporan, this.value);
+        });
+
+        // Load data awal
+        window.currentPdPelaporan = 'all'; // Reset pilihan PD
+        // fetchPelaporanData('all', filter.value); // Nonaktifkan fetch awal
+    }
+
+    // Aktifkan fitur Search & Pagination untuk tabel Pelaporan (Pindahkan ke luar if agar pasti dieksekusi)
+    window.setupTablePagination('pelaporan-table-body', 'search-pelaporan', 'show-entries-pelaporan', 'pagination-pelaporan', 'pagination-info-pelaporan');
+}
+
 // Fungsi Fetch Data API
 window.fetchDokumen = function(tahun) {
     const tbody = document.getElementById('dokumen-table-body');
@@ -238,7 +263,8 @@ window.fetchDokumen = function(tahun) {
             let rows = '';
             if(response.data && response.data.length > 0) {
                 response.data.forEach(item => {
-                    rows += `<tr><td class="text-center">${item.no}</td><td class="d-flex justify-content-between align-items-center"><span>${item.nama}</span><button class="btn btn-sm btn-download-custom rounded-pill px-3"><i class="fas fa-file-pdf me-1"></i> Unduh</button></td></tr>`;
+                    // UPDATE: Menggunakan tombol Lihat dengan Modal Preview (sama seperti Evaluasi/Pelaporan)
+                    rows += `<tr><td class="text-center">${item.no}</td><td class="d-flex justify-content-between align-items-center"><span>${item.nama}</span><button class="btn btn-sm btn-info text-white rounded-pill px-3" onclick="viewPdf('${item.nama}', '${item.download}')"><i class="fas fa-eye me-1"></i> Lihat</button></td></tr>`;
                 });
             } else {
                 rows = '<tr><td colspan="2" class="text-center py-3">Tidak ada dokumen untuk tahun ini.</td></tr>';
@@ -267,7 +293,9 @@ window.fetchEvaluasiData = function(pdName, tahun) {
             if (response.data && response.data.length > 0) {
                 response.data.forEach((item, index) => {
                     // Mapping data dari tabel file_evaluasi
-                    const fileUrl = `storage/evaluasi/${item.lhe_nama_file}`;
+                    // UPDATE: Menggunakan file dummy statis (DUMMY.pdf) di folder public/files/
+                    // Pastikan file DUMMY.pdf sudah ada di folder public/files/
+                    const fileUrl = `files/DUMMY.pdf`;
                     rows += `<tr>
                         <td class="text-center">${index + 1}</td>
                         <td class="text-center">${item.tahun || '-'}</td>
@@ -295,6 +323,53 @@ window.fetchEvaluasiData = function(pdName, tahun) {
         .catch(err => {
             console.error(err);
             tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">Gagal memuat data evaluasi.</td></tr>';
+        });
+}
+
+// Fungsi Fetch Data Pelaporan
+window.fetchPelaporanData = function(pdName, tahun) {
+    const tbody = document.getElementById('pelaporan-table-body');
+    if (!tbody) return;
+ 
+    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div> Loading...</td></tr>';
+
+    const url = `api/pelaporan-data?pd_name=${encodeURIComponent(pdName)}&tahun=${tahun}`;
+
+    fetch(url)
+        .then(res => res.json())
+        .then(response => {
+            let rows = '';
+            if (response.data && response.data.length > 0) {
+                response.data.forEach((item, index) => {
+                    // Menggunakan file dummy statis (DUMMY.pdf) agar bisa dilihat/diunduh
+                    const fileUrl = `files/DUMMY.pdf`;
+                    rows += `<tr>
+                        <td class="text-center">${index + 1}</td>
+                        <td class="text-center">${item.tahun || '-'}</td>
+                        <td>${item.nama_satker || '-'}</td>
+                        <td>
+                            <div class="fw-bold">${item.judul || '-'}</div>
+                            <small class="text-muted">${item.nama_file || ''}</small>
+                        </td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-info text-white rounded-pill px-3" onclick="viewPdf('${item.judul}', '${fileUrl}')"><i class="fas fa-eye me-1"></i> Lihat</button>
+                        </td>
+                    </tr>`;
+                });
+            } else {
+                rows = '<tr><td colspan="5" class="text-center py-4">Data pelaporan tidak ditemukan.</td></tr>';
+            }
+            tbody.innerHTML = rows;
+
+            // Trigger update pagination/search setelah data dimuat
+            const searchInput = document.getElementById('search-pelaporan');
+            if (searchInput) {
+                searchInput.dispatchEvent(new Event('keyup')); 
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">Gagal memuat data pelaporan.</td></tr>';
         });
 }
 
@@ -541,6 +616,8 @@ function loadPage(pageName) {
                 initPengukuran();
             } else if (pageName === 'evaluasi') {
                 initEvaluasi();
+            } else if (pageName === 'pelaporan') {
+                initPelaporan();
             }
         })
         .catch(error => {

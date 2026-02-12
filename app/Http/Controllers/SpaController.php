@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class SpaController extends Controller
 {
@@ -24,18 +25,52 @@ class SpaController extends Controller
         // Ambil parameter tahun, default ke 2026
         $tahun = $request->query('tahun', '2026');
         
-        // Data dummy statis untuk Perencanaan (Jenis Dokumen)
-        $data = [
-            ['no' => 1, 'nama' => 'RPJPD', 'download' => '#'],
-            ['no' => 2, 'nama' => 'RPJMD', 'download' => '#'],
-            ['no' => 3, 'nama' => 'RKPD', 'download' => '#'],
-            ['no' => 4, 'nama' => 'IKU BUPATI', 'download' => '#'],
-            ['no' => 5, 'nama' => 'LKJIP BUPATI', 'download' => '#'],
-            ['no' => 6, 'nama' => 'Perjanjian Kinerja Bupati', 'download' => '#'],
-            ['no' => 7, 'nama' => 'LHE AKIP', 'download' => '#'],
-            ['no' => 8, 'nama' => 'Cascading IKU', 'download' => '#'],
-        ];
+        // Mengambil data menggunakan fungsi private get_kabupaten_data
+        $data = $this->get_kabupaten_data($tahun);
 
         return response()->json(['data' => $data]);
+    }
+
+    private function get_kabupaten_data($tahun) {
+        // Daftar Jenis Dokumen untuk Kabupaten (Key = Nama Tabel, Value = Judul Dokumen)
+        $judul_list = [
+            'dataKab_rpjpd'     => 'RPJPD',
+            'dataKab_rpjmd'     => 'RPJMD',
+            'dataKab_rkpd'      => 'RKPD',
+            'dataKab_iku'       => 'SK Indikator Kinerja Utama',
+            'dataKab_lkjip'     => 'Laporan Kinerja',
+            'dataKab_pkbupati'  => 'Perjanjian Kinerja',
+            'dataKab_lhe'       => 'Laporan Hasil Evaluasi',
+            'dataKab_cascading' => 'Cascading'
+        ];
+
+        $results = [];
+        $no = 1;
+        $dummyPdf = 'files/DUMMY.pdf'; // Fallback jika file tidak ditemukan
+
+        foreach ($judul_list as $table => $judul) {
+            $downloadUrl = $dummyPdf; // Default ke dummy
+
+            // Cek apakah tabel ada di database untuk menghindari error SQL
+            if (Schema::hasTable($table)) {
+                // Ambil data berdasarkan tahun
+                $item = DB::table($table)->where('tahun', $tahun)->first();
+                
+                // Jika data ditemukan dan kolom nama_file ada isinya
+                if ($item && !empty($item->nama_file)) {
+                    // Asumsi file tersimpan di storage/uploads/
+                    // Sesuaikan path ini dengan lokasi penyimpanan file asli Anda
+                    $downloadUrl = asset('storage/uploads/' . $item->nama_file);
+                }
+            }
+
+            $results[] = [
+                'no' => $no++,
+                'nama' => $judul,
+                'download' => $downloadUrl
+            ];
+        }
+
+        return $results;
     }
 }
