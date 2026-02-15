@@ -246,6 +246,21 @@ window.initPelaporan = function() {
     window.setupTablePagination('pelaporan-table-body', 'search-pelaporan', 'show-entries-pelaporan', 'pagination-pelaporan', 'pagination-info-pelaporan');
 }
 
+// Fungsi inisialisasi khusus halaman Prestasi
+window.initPrestasi = function() {
+    const filter = document.getElementById('filter-tahun-prestasi');
+    
+    if (filter) {
+        filter.addEventListener('change', function() {
+            // Logika jika ingin memfilter data prestasi berdasarkan tahun via API di masa depan
+            // Saat ini hanya menampilkan list PD dari tabel user
+        });
+    }
+
+    // Aktifkan fitur Search & Pagination untuk tabel Prestasi
+    window.setupTablePagination('prestasi-table-body', 'search-prestasi', 'show-entries-prestasi', 'pagination-prestasi', 'pagination-info-prestasi');
+}
+
 // Fungsi Fetch Data API
 window.fetchDokumen = function(tahun) {
     const tbody = document.getElementById('dokumen-table-body');
@@ -618,6 +633,8 @@ function loadPage(pageName) {
                 initEvaluasi();
             } else if (pageName === 'pelaporan') {
                 initPelaporan();
+            } else if (pageName === 'prestasi') {
+                initPrestasi();
             }
         })
         .catch(error => {

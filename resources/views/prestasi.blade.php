@@ -7,50 +7,102 @@
     </div>
 
     <div class="row">
-        <!-- 2. Sidebar (Kiri) -->
-        <div class="col-md-3 mb-4">
-            <div class="list-group sidebar-custom shadow-sm">
-                <a href="#" class="list-group-item list-group-item-action active">
-                    Tingkat Nasional <i class="fas fa-chevron-right float-end mt-1 small"></i>
-                </a>
-                <a href="#" class="list-group-item list-group-item-action">
-                    Tingkat Provinsi <i class="fas fa-chevron-right float-end mt-1 small"></i>
-                </a>
-                <a href="#" class="list-group-item list-group-item-action">
-                    Tingkat Kabupaten <i class="fas fa-chevron-right float-end mt-1 small"></i>
-                </a>
-            </div>
-        </div>
-
-        <!-- 3. Konten Utama (Kanan) -->
-        <div class="col-md-9">
+        <!-- Konten Utama (Full Width) -->
+        <div class="col-md-12">
             <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
                 <div class="card-header bg-white py-3">
-                    <h6 class="fw-bold m-0 text-secondary">
-                        <i class="fas fa-medal me-2"></i> DAFTAR PRESTASI & PENGHARGAAN
-                    </h6>
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <h6 class="fw-bold m-0 text-secondary">
+                            <i class="fas fa-medal me-2"></i> DAFTAR PRESTASI PERANGKAT DAERAH
+                        </h6>
+                    </div>
+                    
+                    <!-- Filter Section -->
+                    <div class="filter-section justify-content-center mt-3">
+                        <label for="filter-tahun-prestasi" class="fw-bold text-primary mb-0">Tahun:</label>
+                        <select id="filter-tahun-prestasi" class="form-select form-select-sm" style="width: 120px; border-radius: 5px !important;">
+                            @foreach($years as $y)
+                                <option value="{{ $y }}" {{ $y == date('Y') ? 'selected' : '' }}>{{ $y }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
-                <div class="card-body p-0">
+
+                <div class="card-body p-3">
+                    <!-- Show Entries & Search -->
+                    <div class="row mb-3 align-items-center">
+                        <div class="col-md-6 d-flex align-items-center">
+                            <label class="me-2 text-muted small">Show</label>
+                            <select id="show-entries-prestasi" class="form-select form-select-sm rounded-3 me-2" style="width: 70px;">
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                            </select>
+                            <span class="text-muted small">entries</span>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group input-group-sm justify-content-end">
+                                <span class="input-group-text bg-light border-end-0 text-muted"><i class="fas fa-search"></i></span>
+                                <input type="text" id="search-prestasi" class="form-control border-start-0" placeholder="Search..." style="max-width: 200px;">
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="table-responsive">
                         <table class="table table-striped table-hover mb-0 align-middle">
                             <thead class="table-light text-center">
                                 <tr>
-                                    <th width="5%">NO</th>
+                                    <th width="5%" class="text-center">NO</th>
                                     <th class="text-start">PERANGKAT DAERAH</th>
-                                    <th class="text-start">PRESTASI</th>
+                                    <th class="text-center">PRESTASI</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @foreach($prestasi_list ?? [] as $index => $p)
+                            <tbody id="prestasi-table-body">
+                                @foreach($pd_list ?? [] as $index => $pd)
                                 <tr>
                                     <td class="text-center">{{ $index + 1 }}</td>
-                                    <td>{{ $p['pd'] }}</td>
-                                    <td>{{ $p['ket'] }}</td>
+                                    <td>{{ $pd->nama_satker }}</td>
+                                    <td class="text-center">
+                                        <button class="btn btn-sm btn-info text-white rounded-pill px-3" onclick="viewPdf('Prestasi {{ $pd->nama_satker }}', 'files/DUMMY.pdf')">
+                                            <i class="fas fa-eye me-1"></i> Lihat
+                                        </button>
+                                    </td>
                                 </tr>
                                 @endforeach
                             </tbody>
                         </table>
                     </div>
+                    
+                    <!-- Pagination Footer -->
+                    <div class="d-flex justify-content-between align-items-center p-3">
+                        <div id="pagination-info-prestasi" class="small text-muted">Showing 0 to 0 of 0 entries</div>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0" id="pagination-prestasi">
+                                <!-- Pagination links generated by JS -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Preview PDF -->
+    <div class="modal fade" id="pdfPreviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-light">
+                    <h5 class="modal-title" id="pdfPreviewTitle">Pratinjau Dokumen</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-0">
+                    <iframe id="pdfViewerFrame" src="" style="width: 100%; height: 80vh;" frameborder="0"></iframe>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <a href="#" id="btnDownloadPdf" class="btn btn-success" download target="_blank">
+                        <i class="fas fa-download me-1"></i> Unduh Dokumen
+                    </a>
                 </div>
             </div>
         </div>

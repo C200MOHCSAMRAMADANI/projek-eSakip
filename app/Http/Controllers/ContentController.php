@@ -48,10 +48,14 @@ class ContentController extends Controller
                 break;
             
             case 'prestasi':
-                $data['prestasi_list'] = [
-                    ['pd' => 'Bappeda', 'ket' => 'Juara 1 SAKIP Award'],
-                    ['pd' => 'Dinas Kominfo', 'ket' => 'Terbaik Implementasi SPBE'],
-                ];
+                // Mengambil data Perangkat Daerah dari tabel user
+                $data['pd_list'] = DB::table('user')
+                    ->where('level', '!=', 'admin')
+                    ->orderBy('nama_satker', 'asc')
+                    ->get();
+                
+                // Filter Tahun 2018-2026 (Sesuai permintaan)
+                $data['years'] = range(2026, 2018);
                 break;
         }
 
