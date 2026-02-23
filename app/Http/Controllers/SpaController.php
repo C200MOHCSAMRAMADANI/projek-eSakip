@@ -170,13 +170,9 @@ class SpaController extends Controller
 
         // 3. Data Kinerja PD (List OPD)
         $dataKinerjaPd = DB::table('user')
+            ->where('level', 'client')
             ->where('status', 'aktif')
-            ->whereNotIn('nama_satker', [
-                'PEMERINTAH KABUPATEN GUNUNGKIDUL',
-                'ADMIN',
-                'BAGIAN ORGANISASI SETDA GK',
-                'BAGIAN ORGANISASI'
-            ])
+            ->where('id_opd', '<>', '00_')
             ->orderBy('kd_unit_kerja', 'ASC')
             ->select('nama_satker', 'id_opd')
             ->get();

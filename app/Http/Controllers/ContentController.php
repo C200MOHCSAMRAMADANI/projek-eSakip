@@ -19,9 +19,12 @@ class ContentController extends Controller
             case 'perencanaan': // Tambahkan perencanaan agar mendapat data pd_list
                 // Daftar Perangkat Daerah (Sesuai Permintaan)
                 // MENGAMBIL DARI DATABASE TABEL USER
+                // UPDATE: Menyamakan logic dengan Menu Perencanaan (SpaController::get_opd_data)
                 $data['pd_list'] = DB::table('user')
-                    ->where('level', '!=', 'admin')
-                    ->orderBy('nama_satker', 'asc')->pluck('nama_satker');
+                    ->where('level', 'client')
+                    ->where('status', 'aktif')
+                    ->where('id_opd', '<>', '00_')
+                    ->orderBy('kd_unit_kerja', 'asc')->pluck('nama_satker');
 
                 // Ambil tahun terbaru dari database (pengukuran_iku_2023) atau tahun saat ini
                 // Ini memastikan filter dinamis mengikuti data (misal 2026) atau tahun berjalan
@@ -50,8 +53,10 @@ class ContentController extends Controller
             case 'prestasi':
                 // Mengambil data Perangkat Daerah dari tabel user
                 $data['pd_list'] = DB::table('user')
-                    ->where('level', '!=', 'admin')
-                    ->orderBy('nama_satker', 'asc')
+                    ->where('level', 'client')
+                    ->where('status', 'aktif')
+                    ->where('id_opd', '<>', '00_')
+                    ->orderBy('kd_unit_kerja', 'asc')
                     ->get();
                 
                 // Filter Tahun 2018-2026 (Sesuai permintaan)
