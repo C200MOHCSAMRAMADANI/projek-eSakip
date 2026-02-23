@@ -14,6 +14,9 @@ Route::get('/page/{page}', [ContentController::class, 'getPage']);
 // Route API untuk filter dokumen
 Route::get('/api/dokumen-sakip', [SpaController::class, 'getDokumen']);
 
+// Route API untuk data pengukuran (IKU Kab, PD List, Keuangan)
+Route::get('/api/pengukuran-data', [SpaController::class, 'getPengukuran']);
+
 // Route API untuk detail pengukuran (Modal)
 Route::get('/api/pengukuran-detail', [ContentController::class, 'getPengukuranDetail']);
 

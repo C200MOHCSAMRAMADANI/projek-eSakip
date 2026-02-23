@@ -4,6 +4,7 @@
 window.ikuChartInstance = null;
 window.currentPdEvaluasi = 'all'; // State untuk menyimpan PD yang dipilih di halaman Evaluasi
 window.currentPdPelaporan = 'all'; // State untuk menyimpan PD yang dipilih di halaman Pelaporan
+window.currentPerencanaanTitle = 'Rencana Strategis'; // Default Title Perencanaan
 
 // Template HTML untuk setiap halaman
 const pages = {
@@ -38,6 +39,11 @@ window.updateContent = function(element, title, colHeader) {
     } else {
         // Default (Perencanaan)
         if(mainTitle) mainTitle.innerText = 'Perencanaan Kinerja - ' + title.toUpperCase();
+        
+        // Simpan judul saat ini agar filter tahun tahu apa yang harus diambil
+        window.currentPerencanaanTitle = title;
+        const year = document.getElementById('filter-tahun')?.value || '2026';
+        fetchDokumen(year, title);
     }
     
     // 4. Update Header Kolom Tabel
@@ -137,11 +143,13 @@ window.initPerencanaan = function() {
     if (filter && tbody) {
         // Event Listener saat tahun berubah
         filter.addEventListener('change', function() {
-            fetchDokumen(this.value);
+            // Gunakan judul yang sedang aktif (disimpan di global variable)
+            const currentTitle = window.currentPerencanaanTitle || 'Rencana Strategis';
+            fetchDokumen(this.value, currentTitle);
         });
 
         // Load data awal (sesuai nilai default select, misal 2026)
-        fetchDokumen(filter.value);
+        fetchDokumen(filter.value, window.currentPerencanaanTitle);
     }
 
     // Aktifkan Pagination & Search Realtime untuk Tabel Perangkat Daerah
@@ -171,7 +179,7 @@ window.initPengukuran = function() {
             }
         }
         
-        fetchChartData(year, tw);
+        fetchPengukuranData(year, tw);
     }
 
     if (filter) filter.addEventListener('change', updatePengukuran);
@@ -262,9 +270,12 @@ window.initPrestasi = function() {
 }
 
 // Fungsi Fetch Data API
-window.fetchDokumen = function(tahun) {
-    const tbody = document.getElementById('dokumen-table-body');
-    tbody.innerHTML = '<tr><td colspan="2" class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary" role="status"></div> Loading...</td></tr>';
+window.fetchDokumen = function(tahun, judul = 'Rencana Strategis') {
+    const tbodyKab = document.getElementById('dokumen-table-body');
+    const tbodyOpd = document.getElementById('pd-table-body');
+
+    if(tbodyKab) tbodyKab.innerHTML = '<tr><td colspan="2" class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary" role="status"></div> Loading...</td></tr>';
+    if(tbodyOpd) tbodyOpd.innerHTML = '<tr><td colspan="3" class="text-center py-3"><div class="spinner-border spinner-border-sm text-primary" role="status"></div> Loading...</td></tr>';
 
     // Update Label Tahun di Header Tabel secara dinamis
     const labelTahun = document.getElementById('label-tahun-dokumen');
@@ -272,23 +283,53 @@ window.fetchDokumen = function(tahun) {
         labelTahun.innerText = tahun;
     }
 
-    fetch(`api/dokumen-sakip?tahun=${tahun}`)
+    fetch(`api/dokumen-sakip?tahun=${tahun}&judul=${encodeURIComponent(judul)}`)
         .then(res => res.json())
         .then(response => {
-            let rows = '';
-            if(response.data && response.data.length > 0) {
-                response.data.forEach(item => {
+            // 1. Render Tabel Kabupaten
+            let rowsKab = '';
+            if(response.kabupaten && response.kabupaten.length > 0) {
+                response.kabupaten.forEach(item => {
                     // UPDATE: Menggunakan tombol Lihat dengan Modal Preview (sama seperti Evaluasi/Pelaporan)
-                    rows += `<tr><td class="text-center">${item.no}</td><td class="d-flex justify-content-between align-items-center"><span>${item.nama}</span><button class="btn btn-sm btn-info text-white rounded-pill px-3" onclick="viewPdf('${item.nama}', '${item.download}')"><i class="fas fa-eye me-1"></i> Lihat</button></td></tr>`;
+                    rowsKab += `<tr><td class="text-center">${item.no}</td><td class="d-flex justify-content-between align-items-center"><span>${item.nama}</span><button class="btn btn-sm btn-info text-white rounded-pill px-3" onclick="viewPdf('${item.nama}', '${item.download}')"><i class="fas fa-eye me-1"></i> Lihat</button></td></tr>`;
                 });
             } else {
-                rows = '<tr><td colspan="2" class="text-center py-3">Tidak ada dokumen untuk tahun ini.</td></tr>';
+                rowsKab = '<tr><td colspan="2" class="text-center py-3">Tidak ada dokumen untuk tahun ini.</td></tr>';
             }
-            tbody.innerHTML = rows;
+            if(tbodyKab) tbodyKab.innerHTML = rowsKab;
+
+            // 2. Render Tabel OPD
+            let rowsOpd = '';
+            if(response.data && response.data.length > 0) {
+                response.data.forEach((item, index) => {
+                    let actionBtn = '';
+                    if (item.path && item.path !== '') {
+                        actionBtn = `<button class="btn btn-sm btn-info text-white rounded-pill px-3" onclick="viewPdf('${item.nama_satker} - ${judul}', '${item.path}')"><i class="fas fa-eye me-1"></i> Lihat</button>`;
+                    } else {
+                        actionBtn = `<span class="badge bg-secondary text-white rounded-pill px-3">Belum Tersedia</span>`;
+                    }
+
+                    rowsOpd += `<tr>
+                        <td class="text-center">${index + 1}</td>
+                        <td>${item.nama_satker}</td>
+                        <td class="text-center">${actionBtn}</td>
+                    </tr>`;
+                });
+            } else {
+                rowsOpd = '<tr><td colspan="3" class="text-center py-3">Tidak ada data perangkat daerah.</td></tr>';
+            }
+            if(tbodyOpd) tbodyOpd.innerHTML = rowsOpd;
+
+            // Trigger update pagination/search untuk tabel OPD
+            const searchInput = document.getElementById('search-pd');
+            if (searchInput) {
+                searchInput.dispatchEvent(new Event('keyup')); 
+            }
         })
         .catch(err => {
             console.error(err);
-            tbody.innerHTML = '<tr><td colspan="2" class="text-center text-danger py-3">Gagal memuat data.</td></tr>';
+            if(tbodyKab) tbodyKab.innerHTML = '<tr><td colspan="2" class="text-center text-danger py-3">Gagal memuat data.</td></tr>';
+            if(tbodyOpd) tbodyOpd.innerHTML = '<tr><td colspan="3" class="text-center text-danger py-3">Gagal memuat data.</td></tr>';
         });
 }
 
@@ -462,13 +503,17 @@ window.viewPengukuranDetail = function(pdName) {
     }
 }
 
-// Fungsi Fetch Data Grafik IKU Kabupaten
-window.fetchChartData = function(tahun, triwulan = 'all') {
-    const tbody = document.getElementById('iku-kabupaten-body');
+// Fungsi Fetch Data Pengukuran (IKU Kab, IKU PD, Keuangan)
+window.fetchPengukuranData = function(tahun, triwulan = 'all') {
+    const tbodyIku = document.getElementById('iku-kabupaten-body');
+    const tbodyPd = document.getElementById('table-iku-pd-body');
+    const tbodyKeuangan = document.getElementById('table-keuangan-body');
     const chartCanvas = document.getElementById('ikuChart');
-    if (!tbody) return;
+    
+    if (tbodyIku) tbodyIku.innerHTML = '<tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div> Loading...</td></tr>';
+    if (tbodyPd) tbodyPd.innerHTML = '<tr><td colspan="3" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div> Loading...</td></tr>';
+    if (tbodyKeuangan) tbodyKeuangan.innerHTML = '<tr><td colspan="4" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div> Loading...</td></tr>';
 
-    tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4"><div class="spinner-border text-primary" role="status"></div> Loading...</td></tr>';
 
     // Tampilkan animasi loading pada container grafik
     if (chartCanvas) {
@@ -488,7 +533,7 @@ window.fetchChartData = function(tahun, triwulan = 'all') {
         }
     }
 
-    fetch(`api/iku-kabupaten?tahun=${tahun}&triwulan=${triwulan}`)
+    fetch(`api/pengukuran-data?tahun=${tahun}&triwulan=${triwulan}`)
         .then(res => res.json())
         .then(response => {
             // Hapus overlay loading setelah data diterima
@@ -498,12 +543,13 @@ window.fetchChartData = function(tahun, triwulan = 'all') {
                 if (loader) loader.remove();
             }
 
+            // 1. Render IKU Kabupaten & Chart
             let rows = '';
             const labels = [];
             const dataValues = [];
 
-            if (response.data && response.data.length > 0) {
-                response.data.forEach((item, index) => {
+            if (response.iku_kab && response.iku_kab.length > 0) {
+                response.iku_kab.forEach((item, index) => {
                     rows += `<tr>
                         <td class="text-center">${index + 1}</td>
                         <td>${item.nama_indikator || '-'}</td>
@@ -528,11 +574,56 @@ window.fetchChartData = function(tahun, triwulan = 'all') {
                     window.ikuChartInstance = null;
                 }
             }
-            tbody.innerHTML = rows;
+            if (tbodyIku) tbodyIku.innerHTML = rows;
+
+            // 2. Render IKU Perangkat Daerah (List OPD)
+            let rowsPd = '';
+            if (response.pd_list && response.pd_list.length > 0) {
+                response.pd_list.forEach((item, index) => {
+                    rowsPd += `<tr>
+                        <td class="text-center">${index + 1}</td>
+                        <td>${item.nama_satker}</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm text-white rounded-pill px-3 btn-lihat-data" style="background-color: var(--primary-blue);" onclick="viewPengukuranDetail('${item.nama_satker}')">
+                                <i class="fas fa-eye me-1"></i> Lihat Data
+                            </button>
+                        </td>
+                    </tr>`;
+                });
+            } else {
+                rowsPd = '<tr><td colspan="3" class="text-center py-4">Data Perangkat Daerah tidak ditemukan.</td></tr>';
+            }
+            if (tbodyPd) tbodyPd.innerHTML = rowsPd;
+
+            // 3. Render Keuangan (Dummy / API)
+            let rowsKeuangan = '';
+            const dataKeuangan = (response.keuangan && response.keuangan.length > 0) ? response.keuangan : [];
+            
+            if (dataKeuangan.length > 0) {
+                dataKeuangan.forEach((item, index) => {
+                    rowsKeuangan += `<tr>
+                        <td class="text-center">${index + 1}</td>
+                        <td>${item.nama_satker}</td>
+                        <td class="text-center fw-bold ${parseFloat(item.persen_keuangan) >= 90 ? 'text-success' : 'text-warning'}">
+                            ${item.persen_keuangan}%
+                        </td>
+                        <td class="text-center fw-bold ${parseFloat(item.persen_fisik) >= 90 ? 'text-success' : 'text-primary'}">
+                            ${item.persen_fisik}%
+                        </td>
+                    </tr>`;
+                });
+            } else {
+                rowsKeuangan = '<tr><td colspan="4" class="text-center py-4 text-muted">Data Keuangan belum tersedia.</td></tr>';
+            }
+            if (tbodyKeuangan) tbodyKeuangan.innerHTML = rowsKeuangan;
+
+            // Trigger update pagination
+            if(document.getElementById('search-iku-pd')) document.getElementById('search-iku-pd').dispatchEvent(new Event('keyup'));
+            if(document.getElementById('search-keuangan')) document.getElementById('search-keuangan').dispatchEvent(new Event('keyup'));
         })
         .catch(err => {
             console.error(err);
-            tbody.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">Gagal memuat data grafik.</td></tr>';
+            if (tbodyIku) tbodyIku.innerHTML = '<tr><td colspan="5" class="text-center text-danger py-4">Gagal memuat data.</td></tr>';
             // Hapus overlay loading jika error
             if (chartCanvas) {
                 const chartContainer = chartCanvas.parentElement;
