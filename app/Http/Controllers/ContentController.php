@@ -186,4 +186,20 @@ class ContentController extends Controller
 
         return response()->json(['data' => $query->get()]);
     }
+
+    public function incrementHits(Request $request)
+    {
+        $table = $request->input('table');
+        $id = $request->input('id');
+        $pk = $request->input('pk', 'id'); // Nama kolom Primary Key, default 'id'
+
+        if ($table && $id) {
+            // Pastikan tabel ada untuk keamanan dasar
+            if (\Illuminate\Support\Facades\Schema::hasTable($table)) {
+                DB::table($table)->where($pk, $id)->increment('hits');
+                return response()->json(['success' => true]);
+            }
+        }
+        return response()->json(['success' => false], 400);
+    }
 }

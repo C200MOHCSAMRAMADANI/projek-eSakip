@@ -28,3 +28,6 @@ Route::get('/api/evaluasi-data', [ContentController::class, 'getEvaluasiData']);
 
 // Route API untuk data pelaporan
 Route::get('/api/pelaporan-data', [ContentController::class, 'getPelaporanData']);
+
+// Route API untuk increment hits (Menambah jumlah dilihat)
+Route::post('/api/increment-hits', [ContentController::class, 'incrementHits']);

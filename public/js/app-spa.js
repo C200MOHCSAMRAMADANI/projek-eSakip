@@ -291,7 +291,7 @@ window.fetchDokumen = function(tahun, judul = 'Rencana Strategis') {
             if(response.kabupaten && response.kabupaten.length > 0) {
                 response.kabupaten.forEach(item => {
                     // UPDATE: Menggunakan tombol Lihat dengan Modal Preview (sama seperti Evaluasi/Pelaporan)
-                    rowsKab += `<tr><td class="text-center">${item.no}</td><td class="d-flex justify-content-between align-items-center"><span>${item.nama}</span><button class="btn btn-sm btn-info text-white rounded-pill px-3" onclick="viewPdf('${item.nama}', '${item.download}')"><i class="fas fa-eye me-1"></i> Lihat</button></td></tr>`;
+                    rowsKab += `<tr><td class="text-center">${item.no}</td><td class="d-flex justify-content-between align-items-center"><span>${item.nama}</span><button class="btn btn-sm btn-info text-white rounded-pill px-3" onclick="viewPdf('${item.nama}', '${item.download}', ${item.hits}, '${item.table}', '${item.id}', '${item.pk}')"><i class="fas fa-eye me-1"></i> Lihat</button></td></tr>`;
                 });
             } else {
                 rowsKab = '<tr><td colspan="2" class="text-center py-3">Tidak ada dokumen untuk tahun ini.</td></tr>';
@@ -304,7 +304,7 @@ window.fetchDokumen = function(tahun, judul = 'Rencana Strategis') {
                 response.data.forEach((item, index) => {
                     let actionBtn = '';
                     if (item.path && item.path !== '') {
-                        actionBtn = `<button class="btn btn-sm btn-info text-white rounded-pill px-3" onclick="viewPdf('${item.nama_satker} - ${judul}', '${item.path}')"><i class="fas fa-eye me-1"></i> Lihat</button>`;
+                        actionBtn = `<button class="btn btn-sm btn-info text-white rounded-pill px-3" onclick="viewPdf('${item.nama_satker} - ${judul}', '${item.path}', ${item.hits}, 'file_sakip', '${item.id_file}', 'id_file_sakip')"><i class="fas fa-eye me-1"></i> Lihat</button>`;
                     } else {
                         actionBtn = `<span class="badge bg-secondary text-white rounded-pill px-3">Belum Tersedia</span>`;
                     }
@@ -361,7 +361,7 @@ window.fetchEvaluasiData = function(pdName, tahun) {
                             <small class="text-muted">${item.lhe_nama_file || ''}</small>
                         </td>
                         <td class="text-center">
-                            <button class="btn btn-sm btn-info text-white rounded-pill px-3" onclick="viewPdf('${item.judul}', '${fileUrl}')"><i class="fas fa-eye me-1"></i> Lihat</button>
+                            <button class="btn btn-sm btn-info text-white rounded-pill px-3" onclick="viewPdf('${item.judul}', '${fileUrl}', ${item.hits || 0}, 'file_evaluasi', '${item.id_file_evaluasi}', 'id_file_evaluasi')"><i class="fas fa-eye me-1"></i> Lihat</button>
                         </td>
                     </tr>`;
                 });
@@ -408,7 +408,7 @@ window.fetchPelaporanData = function(pdName, tahun) {
                             <small class="text-muted">${item.nama_file || ''}</small>
                         </td>
                         <td class="text-center">
-                            <button class="btn btn-sm btn-info text-white rounded-pill px-3" onclick="viewPdf('${item.judul}', '${fileUrl}')"><i class="fas fa-eye me-1"></i> Lihat</button>
+                            <button class="btn btn-sm btn-info text-white rounded-pill px-3" onclick="viewPdf('${item.judul}', '${fileUrl}', ${item.hits || 0}, 'file_pelaporan', '${item.id_file_pelaporan}', 'id_file_pelaporan')"><i class="fas fa-eye me-1"></i> Lihat</button>
                         </td>
                     </tr>`;
                 });
@@ -430,12 +430,24 @@ window.fetchPelaporanData = function(pdName, tahun) {
 }
 
 // Fungsi untuk menampilkan Modal Preview PDF
-window.viewPdf = function(title, url) {
+window.viewPdf = function(title, url, hits = 0, table = null, id = null, pk = 'id') {
     const modalEl = document.getElementById('pdfPreviewModal');
     if (modalEl) {
         // Update Judul
         const modalTitle = document.getElementById('pdfPreviewTitle');
         if (modalTitle) modalTitle.innerText = 'Pratinjau - ' + title;
+
+        // Tampilkan Hits Badge
+        let hitsBadge = document.getElementById('pdf-hits-badge');
+        if (!hitsBadge) {
+            // Buat elemen badge jika belum ada
+            hitsBadge = document.createElement('span');
+            hitsBadge.id = 'pdf-hits-badge';
+            hitsBadge.className = 'badge bg-warning text-dark ms-3';
+            hitsBadge.style.fontSize = '0.8rem';
+            modalTitle.parentNode.appendChild(hitsBadge);
+        }
+        hitsBadge.innerHTML = `<i class="fas fa-eye me-1"></i> ${hits}`;
 
         // Update Iframe
         const iframe = document.getElementById('pdfViewerFrame');
@@ -444,6 +456,24 @@ window.viewPdf = function(title, url) {
         // Update Tombol Download
         const btnDownload = document.getElementById('btnDownloadPdf');
         if (btnDownload) btnDownload.href = url;
+
+        // Panggil API Increment Hits jika parameter tersedia
+        if (table && id) {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            fetch('api/increment-hits', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ table, id, pk })
+            })
+            .then(response => {
+                if (response.ok) {
+                    hitsBadge.innerHTML = `<i class="fas fa-eye me-1"></i> ${parseInt(hits) + 1}`;
+                }
+            }).catch(err => console.error("Gagal update hits:", err));
+        }
 
         // Tampilkan Modal
         const modal = new bootstrap.Modal(modalEl);

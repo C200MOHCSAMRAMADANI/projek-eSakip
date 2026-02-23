@@ -52,6 +52,9 @@ class SpaController extends Controller
 
         foreach ($judul_list as $table => $judul) {
             $downloadUrl = $dummyPdf; // Default ke dummy
+            $hits = 0;
+            $id = 0;
+            $pk = 'id'; // Default Primary Key name
 
             // Cek apakah tabel ada di database untuk menghindari error SQL
             if (Schema::hasTable($table)) {
@@ -64,12 +67,24 @@ class SpaController extends Controller
                     // Sesuaikan path ini dengan lokasi penyimpanan file asli Anda
                     $downloadUrl = asset('storage/uploads/' . $item->nama_file);
                 }
+                
+                if ($item) {
+                    $hits = $item->hits ?? 0;
+                    // Mendapatkan nama kolom Primary Key dan nilainya secara dinamis
+                    $itemArray = (array)$item;
+                    $pk = array_key_first($itemArray); // Mengambil nama kolom pertama sebagai PK
+                    $id = $itemArray[$pk];
+                }
             }
 
             $results[] = [
                 'no' => $no++,
                 'nama' => $judul,
-                'download' => $downloadUrl
+                'download' => $downloadUrl,
+                'hits' => $hits,
+                'table' => $table,
+                'id' => $id,
+                'pk' => $pk
             ];
         }
 
@@ -104,7 +119,8 @@ class SpaController extends Controller
                 'fa.nama_file',
                 'fa.verifikasi',
                 'fa.tgl_verifikasi',
-                'fa.tahun'
+                'fa.tahun',
+                'fa.hits'
             )
             ->orderBy('u.kd_unit_kerja', 'ASC')
             ->get();
@@ -121,7 +137,9 @@ class SpaController extends Controller
                 'nama_file' => $item->nama_file,
                 'path' => $path,
                 'verifikasi' => $item->verifikasi,
-                'tgl_verifikasi' => $item->tgl_verifikasi
+                'tgl_verifikasi' => $item->tgl_verifikasi,
+                'hits' => $item->hits ?? 0,
+                'id_file' => $item->id_file_sakip
             ];
         });
     }
