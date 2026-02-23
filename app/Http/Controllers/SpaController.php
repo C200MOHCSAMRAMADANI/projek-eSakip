@@ -132,7 +132,8 @@ class SpaController extends Controller
         $triwulan = $request->query('triwulan', 'all');
 
         // 1. API SIPANDA (Keuangan) - Dummy
-        // Mengambil data OPD aktif untuk simulasi data keuangan
+        // TRIK: Kita masukkan variabel $triwulan ke dalam crc32()
+        // Jadi ketika filter triwulan diubah, angka persentasenya akan ikut berubah secara otomatis!
         $dataKeuangan = DB::table('user')
             ->select('nama_satker')
             ->where('level', 'client')
@@ -140,13 +141,12 @@ class SpaController extends Controller
             ->where('id_opd', '<>', '00_')
             ->orderBy('nama_satker', 'ASC')
             ->get()
-            ->map(function ($item) use ($tahun) {
-                // Gunakan seed agar angka konsisten per OPD & Tahun (tidak berubah saat refresh)
-                mt_srand(crc32($item->nama_satker . $tahun));
+            ->map(function ($item) use ($tahun, $triwulan) {
+                // Seed gabungan: Nama OPD + Tahun + Triwulan
+                mt_srand(crc32($item->nama_satker . $tahun . $triwulan));
                 
-                // Simulasi Persentase saja (Keuangan & Fisik)
-                $persenKeuangan = mt_rand(7500, 9900) / 100; // Random 75.00 - 99.00
-                $persenFisik = mt_rand(8000, 10000) / 100;   // Random 80.00 - 100.00
+                $persenKeuangan = mt_rand(7500, 9900) / 100; 
+                $persenFisik = mt_rand(8000, 10000) / 100;   
                 
                 return [
                     'nama_satker' => $item->nama_satker,
@@ -156,19 +156,16 @@ class SpaController extends Controller
             });
 
         // 2. Data IKU Kabupaten (Dari Database)
-        $query = DB::table('pengukuran_iku_2023');
-
+        // SESUAI PERMINTAAN: Datanya "tetap saja", tidak dipengaruhi filter triwulan.
+        // Jadi query triwulan di sini dihapus, murni hanya filter berdasarkan Tahun.
+        $queryIkuKab = DB::table('pengukuran_iku_2023');
         if ($tahun !== 'all') {
-            $query->where('tahun', $tahun);
+            $queryIkuKab->where('tahun', $tahun);
         }
-
-        if ($triwulan !== 'all') {
-            $query->where('triwulan', $triwulan);
-        }
-
-        $dataIkuKab = $query->get();
+        $dataIkuKab = $queryIkuKab->get();
 
         // 3. Data Kinerja PD (List OPD)
+        // SESUAI PERMINTAAN: Datanya "tetap saja", tidak dipengaruhi filter triwulan.
         $dataKinerjaPd = DB::table('user')
             ->where('level', 'client')
             ->where('status', 'aktif')
