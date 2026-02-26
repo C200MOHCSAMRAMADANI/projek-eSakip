@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>eSakip</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -42,6 +43,29 @@
                     </li>
                     <li class="nav-item"><a class="nav-link" href="#" onclick="loadPage('infografis')">Info Grafis</a></li>
                     <li class="nav-item"><a class="nav-link" href="#" onclick="loadPage('kontak')">Kontak</a></li>
+                    
+                    @if(session('logged_in'))
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-1"></i> {{ session('nama_lengkap') ?? session('username') }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><span class="dropdown-item-text text-muted small">{{ ucfirst(session('level')) }}</span></li>
+                            <li><hr class="dropdown-divider"></li>
+                            @if(session('level') === 'admin' || session('level') === 'moderator')
+                            <li><a class="dropdown-item" href="/dashboard-admin"><i class="fas fa-tachometer-alt me-2"></i>Dashboard Admin</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            @endif
+                            <li><a class="dropdown-item text-danger" href="{{ route('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                        </ul>
+                    </li>
+                    @else
+                    <li class="nav-item">
+                        <a class="nav-link btn-login" href="/login">
+                            Login
+                        </a>
+                    </li>
+                    @endif
                 </ul>
             </div>
         </div>

@@ -5,6 +5,7 @@
     --bg-light: #f4f7fa;
     --sakip-teal: #1a8392;
     --sakip-bg-grey: #e8e8e8;
+    --login-white: #FFFFFF;
 }
 
 body {
@@ -19,15 +20,12 @@ body {
 /* --- NAVBAR UTAMA --- */
 .navbar {
     background-color: var(--primary-blue);
-    padding: 15px 0;
+    padding: 10px 0;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    /* Transisi halus untuk efek scroll */
     transition: all 0.4s ease-in-out;
-    /* FIX: Pastikan navbar memiliki z-index tinggi agar tidak tertutup hero section */
     z-index: 1050;
 }
 
-/* Pastikan icon hamburger berwarna Putih saat navbar Biru (default) */
 .navbar-toggler-icon {
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 1%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
 }
@@ -42,7 +40,7 @@ body {
 
 .brand-title {
     line-height: 1;
-    font-size: 1.5rem; /* fs-4 equivalent approx */
+    font-size: 1.5rem;
 }
 
 .brand-subtitle {
@@ -50,57 +48,145 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* Wrapper Konten Utama */
 #main-content {
-    padding-top: 120px;
-    min-height: 60vh; /* Agar footer tidak naik jika konten sedikit */
+    padding-top: 100px;
+    min-height: 60vh;
 }
 
-.nav-link {
+/* --- NAVBAR MENU ITEMS --- */
+.navbar-nav {
+    align-items: center;
+    gap: 4px;
+}
+
+.navbar-nav .nav-link {
     color: white !important;
     font-weight: 500;
-    margin-left: 20px;
-    transition: color 0.3s ease;
+    padding: 8px 14px !important;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    text-align: center;
 }
 
-.nav-link:hover {
+.navbar-nav .nav-link:hover {
     color: var(--primary-yellow) !important;
+    background-color: rgba(255, 255, 255, 0.15);
 }
 
-/* --- EFEK SCROLL NAVBAR (Gaya Banyuwangi) --- */
-/* Kelas ini akan ditambahkan otomatis oleh JavaScript saat discroll */
+/* Dropdown Toggle */
+.navbar-nav .dropdown-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
+.navbar-nav .dropdown-toggle::after {
+    display: inline-block;
+    margin-left: 6px;
+    vertical-align: middle;
+    content: "";
+    border-top: 5px solid;
+    border-right: 5px solid transparent;
+    border-left: 5px solid transparent;
+}
+
+/* Dropdown Menu Styling */
+.navbar-nav .dropdown-menu {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    padding: 10px;
+    margin-top: 10px;
+    background-color: white;
+    min-width: 180px;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.navbar-nav .dropdown-menu .dropdown-item {
+    border-radius: 6px;
+    padding: 10px 14px;
+    color: #444;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    margin-bottom: 2px;
+}
+
+.navbar-nav .dropdown-menu .dropdown-item:hover {
+    background-color: var(--primary-blue);
+    color: white;
+    padding-left: 18px;
+}
+
+.navbar-nav .dropdown-menu .dropdown-item:last-child {
+    margin-bottom: 0;
+}
+
+/* --- EFEK SCROLL NAVBAR --- */
 .navbar-scrolled {
-    background-color: #ffffff !important; /* Latar berubah Putih */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Bayangan lebih lembut */
-    padding: 10px 0 !important; /* Navbar sedikit mengecil */
+    background-color: #ffffff !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    padding: 8px 0 !important;
 }
 
-/* Ubah warna teks menu jadi Biru saat scroll */
 .navbar-scrolled .nav-link {
     color: var(--primary-blue) !important;
 }
 
-/* Ubah warna teks Logo (eSakip & Kabupaten) jadi Biru saat scroll */
+.navbar-scrolled .nav-link:hover {
+    color: var(--primary-yellow) !important;
+    background-color: rgba(14, 91, 142, 0.1);
+}
+
 .navbar-scrolled .brand-text h1,
 .navbar-scrolled .brand-text p,
 .navbar-scrolled .brand-text span {
     color: var(--primary-blue) !important;
 }
 
-/* Hover menu tetap Kuning */
-.navbar-scrolled .nav-link:hover {
-    color: #ffcc00 !important; /* Kuning lebih gelap saat navbar putih */
+.navbar-scrolled .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%230e5b8e' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
 }
 
-/* Ubah icon hamburger (mobile) jadi Biru saat background putih */
-.navbar-scrolled .navbar-toggler-icon {
-    /* Menggunakan SVG icon dengan stroke warna Primary Blue (#0e5b8e) */
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='%230e5b8e' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
-    filter: none; 
-}
 .navbar-scrolled .navbar-toggler {
     border-color: rgba(0,0,0,0.1);
+}
+
+/* --- TOMBOL LOGIN DI NAVBAR --- */
+/* Default (navbar biru) - tombol kuning agar terlihat jelas */
+.btn-login {
+    background-color: var(--primary-yellow);
+    border: none;
+    border-radius: 4px;
+    padding: 6px 20px;
+    color: #333333 !important;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    margin-left: 8px;
+}
+
+.btn-login:hover {
+    background-color: #ffffff;
+    border: none;
+    color: var(--primary-blue) !important;
+}
+
+/* Saat discroll - tombol biru dengan teks putih */
+.navbar-scrolled .btn-login {
+    background-color: var(--primary-blue);
+    border: none;
+    color: #ffffff !important;
+}
+
+.navbar-scrolled .btn-login:hover {
+    background-color: var(--primary-yellow);
+    border: none;
+    color: #333333 !important;
 }
 
 /* --- DASHBOARD HERO --- */
@@ -137,7 +223,6 @@ body {
     height: 100%;
 }
 
-/* Container kartu menu yang overlap ke atas */
 .dashboard-cards-overlap {
     margin-top: -80px;
     position: relative;
@@ -181,7 +266,7 @@ body {
     background-color: #c0c0c0;
 }
 
-/* --- SECTION PRIORITAS (Dashboard Bawah) --- */
+/* --- SECTION PRIORITAS --- */
 .priority-section {
     background-color: var(--primary-blue);
     padding-top: 60px;
@@ -199,7 +284,7 @@ body {
     opacity: 0.5;
 }
 
-/* --- HEADER HALAMAN (Breadcrumb) --- */
+/* --- HEADER HALAMAN --- */
 .page-header-bar {
     background-color: var(--sakip-bg-grey);
     padding: 15px 20px;
@@ -212,7 +297,7 @@ body {
     margin-bottom: 20px;
 }
 
-/* --- UTILITIES LAIN --- */
+/* --- UTILITIES --- */
 .alert-custom-red {
     background-color: #ff3b30;
 }
@@ -253,7 +338,7 @@ footer {
     color: white;
 }
 
-/* --- SIDEBAR CUSTOM (Perencanaan) --- */
+/* --- SIDEBAR CUSTOM --- */
 .sidebar-custom {
     border-radius: 8px;
     overflow: hidden;
@@ -275,7 +360,7 @@ footer {
 
 .sidebar-custom .list-group-item:hover {
     background-color: #e2e2e2;
-    padding-left: 25px; /* Efek geser sedikit saat hover */
+    padding-left: 25px;
 }
 
 .sidebar-custom .list-group-item.active {
@@ -284,30 +369,28 @@ footer {
     border-color: var(--sakip-teal);
 }
 
-/* --- KONTEN PERENCANAAN (Filter & Tabel) --- */
-
-/* 1. Wrapper Filter agar sejajar dan rapi */
+/* --- KONTEN PERENCANAAN --- */
 .filter-section {
     display: flex;
     align-items: center;
-    gap: 15px; /* Jarak antara label dan dropdown */
-    margin-bottom: 25px; /* Jarak ke tabel di bawahnya */
+    gap: 15px;
+    margin-bottom: 25px;
     padding: 15px 20px;
     background-color: #fff;
     border-radius: 10px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.05); /* Efek timbul halus */
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
 .filter-section label {
     margin-bottom: 0;
     font-weight: 600;
     color: var(--primary-blue);
-    white-space: nowrap; /* Mencegah teks turun baris */
+    white-space: nowrap;
 }
 
 .filter-section .form-select {
-    max-width: 200px; /* Batasi lebar dropdown */
-    border-radius: 50px; /* Style rounded pill */
+    max-width: 200px;
+    border-radius: 50px;
     border: 1px solid #e0e0e0;
     padding-left: 15px;
 }
@@ -317,7 +400,6 @@ footer {
     box-shadow: 0 0 0 0.2rem rgba(26, 131, 146, 0.25);
 }
 
-/* 2. Tombol Download Custom (Konsisten & Hover Effect) */
 .btn-download-custom {
     background-color: var(--sakip-teal);
     color: white !important;
@@ -327,22 +409,21 @@ footer {
     transition: all 0.3s ease;
     display: inline-flex;
     align-items: center;
-    gap: 6px; /* Jarak icon dan teks */
+    gap: 6px;
     cursor: pointer;
-    white-space: nowrap; /* Mencegah teks turun baris di layar kecil */
+    white-space: nowrap;
 }
 
 .btn-download-custom:hover {
     background-color: var(--primary-blue);
-    transform: translateY(-2px); /* Efek naik sedikit saat hover */
+    transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
-/* 3. Tabel Responsif Wrapper */
 .table-responsive-custom {
     display: block;
     width: 100%;
-    overflow-x: auto; /* Scroll samping jika layar kecil */
+    overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     border-radius: 8px;
     background: white;
@@ -351,14 +432,14 @@ footer {
 
 /* --- PDF PREVIEW MODAL --- */
 .pdf-modal-body {
-    height: 80vh; /* Tinggi default untuk desktop */
+    height: 80vh;
     overflow: hidden;
 }
 
 @media (max-width: 767.98px) {
     .pdf-modal-body {
-        height: 100%; /* Mengisi penuh area modal saat mode fullscreen di mobile */
-        min-height: 400px; /* Jaga-jaga agar tidak terlalu pendek */
+        height: 100%;
+        min-height: 400px;
     }
 }
 
@@ -437,18 +518,40 @@ footer {
 
 /* --- CONTACT PAGE MAP RESPONSIVE --- */
 .contact-map-wrapper {
-    height: 400px; /* Default Desktop */
+    height: 400px;
 }
 
 @media (max-width: 767.98px) {
     .contact-map-wrapper {
-        height: 300px; /* Tinggi peta di perangkat mobile agar tidak terlalu panjang */
+        height: 300px;
     }
 }
 
-/* Utility untuk Input Search di Mobile */
 @media (max-width: 767.98px) {
     .w-100-mobile {
         width: 100% !important;
+    }
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 991px) {
+    .navbar-nav {
+        padding: 15px;
+        background-color: var(--primary-blue);
+        border-radius: 8px;
+        margin-top: 10px;
+    }
+    
+    .navbar-scrolled .navbar-nav {
+        background-color: white;
+    }
+    
+    .navbar-nav .nav-link {
+        margin: 4px 0;
+    }
+    
+    .btn-login {
+        margin: 10px 0 0 0;
+        width: 100%;
     }
 }

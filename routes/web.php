@@ -3,10 +3,20 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\SpaController;
+use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Route untuk autentikasi
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login.form');
+Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/dashboard-admin', [AuthController::class, 'dashboardAdmin']);
+
+// Route untuk cek status autentikasi (API)
+Route::get('/api/auth-status', [AuthController::class, 'checkAuthStatus']);
 
 // Route untuk menangani permintaan halaman dinamis dari app-spa.js
 Route::get('/page/{page}', [ContentController::class, 'getPage']);
@@ -30,4 +40,4 @@ Route::get('/api/evaluasi-data', [ContentController::class, 'getEvaluasiData']);
 Route::get('/api/pelaporan-data', [ContentController::class, 'getPelaporanData']);
 
 // Route API untuk increment hits (Menambah jumlah dilihat)
-Route::post('/api/increment-hits', [ContentController::class, 'incrementHits']);
+Route::post('/api/increment-hits', [ContentController::class, 'incrementHits'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);

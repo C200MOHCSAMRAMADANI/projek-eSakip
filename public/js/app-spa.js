@@ -5,12 +5,93 @@ window.ikuChartInstance = null;
 window.currentPdEvaluasi = 'all'; // State untuk menyimpan PD yang dipilih di halaman Evaluasi
 window.currentPdPelaporan = 'all'; // State untuk menyimpan PD yang dipilih di halaman Pelaporan
 window.currentPerencanaanTitle = 'Rencana Strategis'; // Default Title Perencanaan
+window.currentUser = null; // State untuk menyimpan data user yang login
 
 // Template HTML untuk setiap halaman
 const pages = {
     // Hapus konten dashboard dan perencanaan yang sudah dipindah ke Blade
     // agar sistem memaksa load dari server.
 };
+
+// Fungsi untuk memeriksa status autentikasi
+window.checkAuthStatus = function() {
+    fetch('/api/auth-status')
+        .then(res => res.json())
+        .then(response => {
+            if (response.authenticated) {
+                window.currentUser = response.user;
+                window.updateNavbarForAuthenticated(response.user);
+            } else {
+                window.currentUser = null;
+                window.updateNavbarForGuest();
+            }
+        })
+        .catch(err => {
+            console.error('Error checking auth status:', err);
+            window.updateNavbarForGuest();
+        });
+}
+
+// Fungsi untuk update navbar jika user sudah login
+window.updateNavbarForAuthenticated = function(user) {
+    const navbarNav = document.querySelector('.navbar-nav');
+    if (!navbarNav) return;
+
+    // Cek apakah navbar sudah diupdate (untuk menghindari duplikasi)
+    const existingUserMenu = navbarNav.querySelector('.user-menu');
+    if (existingUserMenu) return;
+
+    // Hapus tombol login jika ada
+    const loginLink = navbarNav.querySelector('a[href="/login"]');
+    if (loginLink) {
+        const parentLi = loginLink.closest('li');
+        if (parentLi) parentLi.remove();
+    }
+
+    // Buat dropdown menu untuk user
+    const userMenuHtml = `
+        <li class="nav-item dropdown user-menu">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                <i class="fas fa-user-circle me-1"></i> ${user.nama_lengkap || user.username}
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><span class="dropdown-item-text text-muted small">${user.level.charAt(0).toUpperCase() + user.level.slice(1)}</span></li>
+                <li><hr class="dropdown-divider"></li>
+                ${(user.level === 'admin' || user.level === 'moderator') ? '<li><a class="dropdown-item" href="/dashboard-admin"><i class="fas fa-tachometer-alt me-2"></i>Dashboard Admin</a></li><li><hr class="dropdown-divider"></li>' : ''}
+                <li><a class="dropdown-item text-danger" href="/logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+            </ul>
+        </li>
+    `;
+
+    navbarNav.insertAdjacentHTML('beforeend', userMenuHtml);
+}
+
+// Fungsi untuk update navbar jika user belum login
+window.updateNavbarForGuest = function() {
+    const navbarNav = document.querySelector('.navbar-nav');
+    if (!navbarNav) return;
+
+    // Cek apakah sudah ada tombol login
+    const existingLoginLink = navbarNav.querySelector('a[href="/login"]');
+    if (existingLoginLink) return;
+
+    // Hapus user menu jika ada
+    const existingUserMenu = navbarNav.querySelector('.user-menu');
+    if (existingUserMenu) {
+        existingUserMenu.remove();
+    }
+
+    // Tambahkan tombol login
+    const loginHtml = `
+        <li class="nav-item">
+            <a class="nav-link" href="/login">
+                <i class="fas fa-sign-in-alt me-1"></i> Login
+            </a>
+        </li>
+    `;
+
+    navbarNav.insertAdjacentHTML('beforeend', loginHtml);
+}
 
 // Fungsi global untuk interaksi Sidebar (dipindahkan dari Blade)
 window.updateContent = function(element, title, colHeader) {
@@ -269,7 +350,7 @@ window.initPrestasi = function() {
     window.setupTablePagination('prestasi-table-body', 'search-prestasi', 'show-entries-prestasi', 'pagination-prestasi', 'pagination-info-prestasi');
 }
 
-// Fungsi Fetch Data API
+// Fungsi Fetch Data Api
 window.fetchDokumen = function(tahun, judul = 'Rencana Strategis') {
     const tbodyKab = document.getElementById('dokumen-table-body');
     const tbodyOpd = document.getElementById('pd-table-body');
@@ -460,7 +541,7 @@ window.viewPdf = function(title, url, hits = 0, table = null, id = null, pk = 'i
         // Panggil API Increment Hits jika parameter tersedia
         if (table && id) {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-            fetch('api/increment-hits', {
+            fetch('/api/increment-hits', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -625,7 +706,7 @@ window.fetchPengukuranData = function(tahun, triwulan = 'all') {
             }
             if (tbodyPd) tbodyPd.innerHTML = rowsPd;
 
-            // 3. Render Keuangan (Dummy / API)
+            // 3. Render Keuangan (Dummy / Api)
             let rowsKeuangan = '';
             const dataKeuangan = (response.keuangan && response.keuangan.length > 0) ? response.keuangan : [];
             
@@ -792,4 +873,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const page = window.location.hash.substring(1);
     // Jika ada hash load page tersebut, jika tidak load dashboard
     loadPage(page || 'dashboard');
+
+    // Periksa status autentikasi saat halaman dimuat
+    window.checkAuthStatus();
 });

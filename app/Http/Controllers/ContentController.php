@@ -191,15 +191,35 @@ class ContentController extends Controller
     {
         $table = $request->input('table');
         $id = $request->input('id');
-        $pk = $request->input('pk', 'id'); // Nama kolom Primary Key, default 'id'
+        $pk = $request->input('pk'); 
+
+        // Mapping nama PK untuk setiap tabel
+        $pkMapping = [
+            'file_sakip' => 'id_file_sakip',
+            'file_evaluasi' => 'id_file_evaluasi',
+            'file_pelaporan' => 'id_file_pelaporan',
+            'file_pengukuran' => 'id_file_pengukuran',
+            'file_table' => 'id_file',
+        ];
+        
+        // Gunakan pk dari request jika ada, atau gunakan mapping default
+        if (!$pk && isset($pkMapping[$table])) {
+            $pk = $pkMapping[$table];
+        } elseif (!$pk) {
+            $pk = 'id'; // Default fallback
+        }
 
         if ($table && $id) {
             // Pastikan tabel ada untuk keamanan dasar
             if (\Illuminate\Support\Facades\Schema::hasTable($table)) {
-                DB::table($table)->where($pk, $id)->increment('hits');
-                return response()->json(['success' => true]);
+                try {
+                    DB::table($table)->where($pk, $id)->increment('hits');
+                    return response()->json(['success' => true, 'debug' => ['table' => $table, 'pk' => $pk, 'id' => $id]]);
+                } catch (\Exception $e) {
+                    return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+                }
             }
         }
-        return response()->json(['success' => false], 400);
+        return response()->json(['success' => false, 'message' => 'Table or ID not provided'], 400);
     }
 }

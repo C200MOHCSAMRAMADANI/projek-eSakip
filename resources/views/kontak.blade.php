@@ -14,6 +14,8 @@
                 <p><i class="fas fa-envelope text-danger fa-lg me-2"></i> Email : <a href="mailto:subkrokskinerja@gmail.com" class="text-decoration-none text-primary">subkrokskinerja@gmail.com</a></p>
             </div>
             <div class="col-md-6">
+                
+                <!-- Google Maps -->
                 <div class="rounded overflow-hidden shadow-lg mb-3 contact-map-wrapper">
                     <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d650.3271680289669!2d110.60166205678969!3d-7.964492593340112!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e7bb3eb87764a4f%3A0x2a9dfa6377bec091!2sSekretariat%20Daerah%20Kabupaten%20Gunungkidul!5e0!3m2!1sen!2sid!4v1770917307545!5m2!1sen!2sid" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </div>
