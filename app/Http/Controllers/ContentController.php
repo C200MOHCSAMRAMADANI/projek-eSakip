@@ -224,4 +224,37 @@ class ContentController extends Controller
         }
         return response()->json(['success' => false, 'message' => 'Table or ID not provided'], 400);
     }
+    public function incrementHitsUnduh(Request $request)
+    {
+        $table = $request->input('table');
+        $id = $request->input('id');
+        $pk = $request->input('pk'); 
+
+        $pkMapping = [
+            'file_sakip' => 'id_file_sakip',
+            'file_evaluasi' => 'id_file_evaluasi',
+            'file_pelaporan' => 'id_file_pelaporan',
+            'prestasi' => 'id_prestasi',
+            'file_table' => 'id_file',
+        ];
+        
+        if (!$pk && isset($pkMapping[$table])) {
+            $pk = $pkMapping[$table];
+        } elseif (!$pk) {
+            $pk = 'id';
+        }
+
+        if ($table && $id) {
+            if (\Illuminate\Support\Facades\Schema::hasTable($table) && \Illuminate\Support\Facades\Schema::hasColumn($table, 'hits_unduh')) {
+                try {
+                    // Yang ditambah adalah kolom hits_unduh
+                    DB::table($table)->where($pk, $id)->increment('hits_unduh');
+                    return response()->json(['success' => true]);
+                } catch (\Exception $e) {
+                    return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+                }
+            }
+        }
+        return response()->json(['success' => false], 400);
+    }
 }

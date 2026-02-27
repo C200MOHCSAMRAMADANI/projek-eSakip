@@ -41,3 +41,6 @@ Route::get('/api/pelaporan-data', [ContentController::class, 'getPelaporanData']
 
 // Route API untuk increment hits (Menambah jumlah dilihat)
 Route::post('/api/increment-hits', [ContentController::class, 'incrementHits'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
+
+//Route::post('/api/increment-hits-unduh')  
+Route::post('/api/increment-hits-unduh', [App\Http\Controllers\ContentController::class, 'incrementHitsUnduh'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);

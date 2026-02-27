@@ -543,11 +543,32 @@ window.viewPdf = function(title, url, hits = 0, table = null, id = null, pk = 'i
         if (iframe) iframe.src = url;
 
         // Update Tombol Download
+       // Update Tombol Download
         const btnDownload = document.getElementById('btnDownloadPdf');
-        if (btnDownload) btnDownload.href = url;
+        if (btnDownload) {
+            btnDownload.href = url;
+            
+            // --- LOGIKA HITS UNDUH (BARU) ---
+            // Hanya dieksekusi ketika tombol "Unduh Dokumen" di-klik
+            btnDownload.onclick = function() {
+                if (table && id && id !== 'null' && id !== '0' && id !== '') {
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+                    
+                    fetch('/api/increment-hits-unduh', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken
+                        },
+                        body: JSON.stringify({ table: table, id: id, pk: pk })
+                    }).catch(err => console.error("Gagal update hits unduh:", err));
+                }
+            };
+            // ---------------------------------
+        }
 
-        // --- LOGIKA HITS TERPADU ---
-        // Eksekusi hits HANYA JIKA id benar-benar ada (bukan dummy/null)
+        // --- LOGIKA HITS TERPADU (YANG LAMA TETAP ADA) ---
+        // Dieksekusi otomatis saat Modal Preview terbuka (untuk hitungan "Lihat")
         if (table && id && id !== 'null' && id !== '0' && id !== '') {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             
@@ -565,7 +586,7 @@ window.viewPdf = function(title, url, hits = 0, table = null, id = null, pk = 'i
                     hitsBadge.innerHTML = `<i class="fas fa-eye me-1"></i> ${currentHits + 1}`;
                 }
             }).catch(err => console.error("Gagal update hits:", err));
-        }
+        } 
 
         // Tampilkan Modal
         const modal = new bootstrap.Modal(modalEl);
