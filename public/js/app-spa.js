@@ -477,9 +477,10 @@ window.fetchPelaporanData = function(pdName, tahun) {
         .then(response => {
             let rows = '';
             if (response.data && response.data.length > 0) {
+                // ... (kode di atasnya)
                 response.data.forEach((item, index) => {
                     // Menggunakan file dummy statis (DUMMY.pdf) agar bisa dilihat/diunduh
-                    const fileUrl = `files/DUMMY.pdf`;
+                    const fileUrl = `files/DUMMY.pdf`; 
                     rows += `<tr>
                         <td class="text-center">${index + 1}</td>
                         <td class="text-center">${item.tahun || '-'}</td>
@@ -489,10 +490,14 @@ window.fetchPelaporanData = function(pdName, tahun) {
                             <small class="text-muted">${item.nama_file || ''}</small>
                         </td>
                         <td class="text-center">
-                            <button class="btn btn-sm btn-info text-white rounded-pill px-3" onclick="viewPdf('${item.judul}', '${fileUrl}', ${item.hits || 0}, 'file_pelaporan', '${item.id_file_pelaporan}', 'id_file_pelaporan')"><i class="fas fa-eye me-1"></i> Lihat</button>
+                            <button class="btn btn-sm btn-info text-white rounded-pill px-3" 
+                                    onclick="viewPdf('${item.judul}', '${fileUrl}', ${item.hits || 0}, 'file_sakip', '${item.id_file_sakip || 0}', 'id_file_sakip')">
+                                <i class="fas fa-eye me-1"></i> Lihat
+                            </button>
                         </td>
                     </tr>`;
                 });
+                // ... (kode di bawahnya)
             } else {
                 rows = '<tr><td colspan="5" class="text-center py-4">Data pelaporan tidak ditemukan.</td></tr>';
             }
@@ -511,6 +516,7 @@ window.fetchPelaporanData = function(pdName, tahun) {
 }
 
 // Fungsi untuk menampilkan Modal Preview PDF
+// Fungsi untuk menampilkan Modal Preview PDF
 window.viewPdf = function(title, url, hits = 0, table = null, id = null, pk = 'id') {
     const modalEl = document.getElementById('pdfPreviewModal');
     if (modalEl) {
@@ -521,14 +527,16 @@ window.viewPdf = function(title, url, hits = 0, table = null, id = null, pk = 'i
         // Tampilkan Hits Badge
         let hitsBadge = document.getElementById('pdf-hits-badge');
         if (!hitsBadge) {
-            // Buat elemen badge jika belum ada
             hitsBadge = document.createElement('span');
             hitsBadge.id = 'pdf-hits-badge';
             hitsBadge.className = 'badge bg-warning text-dark ms-3';
             hitsBadge.style.fontSize = '0.8rem';
             modalTitle.parentNode.appendChild(hitsBadge);
         }
-        hitsBadge.innerHTML = `<i class="fas fa-eye me-1"></i> ${hits}`;
+        
+        // Pastikan angka awal aman dari undefined
+        let currentHits = parseInt(hits) || 0;
+        hitsBadge.innerHTML = `<i class="fas fa-eye me-1"></i> ${currentHits}`;
 
         // Update Iframe
         const iframe = document.getElementById('pdfViewerFrame');
@@ -538,20 +546,23 @@ window.viewPdf = function(title, url, hits = 0, table = null, id = null, pk = 'i
         const btnDownload = document.getElementById('btnDownloadPdf');
         if (btnDownload) btnDownload.href = url;
 
-        // Panggil API Increment Hits jika parameter tersedia
-        if (table && id) {
+        // --- LOGIKA HITS TERPADU ---
+        // Eksekusi hits HANYA JIKA id benar-benar ada (bukan dummy/null)
+        if (table && id && id !== 'null' && id !== '0' && id !== '') {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            
             fetch('/api/increment-hits', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken
                 },
-                body: JSON.stringify({ table, id, pk })
+                body: JSON.stringify({ table: table, id: id, pk: pk })
             })
             .then(response => {
                 if (response.ok) {
-                    hitsBadge.innerHTML = `<i class="fas fa-eye me-1"></i> ${parseInt(hits) + 1}`;
+                    // Update angka badge di modal secara instan (ditambah 1)
+                    hitsBadge.innerHTML = `<i class="fas fa-eye me-1"></i> ${currentHits + 1}`;
                 }
             }).catch(err => console.error("Gagal update hits:", err));
         }
@@ -563,7 +574,7 @@ window.viewPdf = function(title, url, hits = 0, table = null, id = null, pk = 'i
 }
 
 // Fungsi untuk menampilkan Modal Detail Pengukuran
-window.viewPengukuranDetail = function(pdName) {
+window.viewPengukuranDetail = function(pdName, idFilePengukuran = null) {
     const modalEl = document.getElementById('pengukuranDetailModal');
     if (modalEl) {
         // Ambil tahun dari filter dropdown (jika ada), default 2026
@@ -574,6 +585,24 @@ window.viewPengukuranDetail = function(pdName) {
         // Update Judul Modal
         const modalTitle = document.getElementById('pengukuranDetailTitle');
         if (modalTitle) modalTitle.innerText = `Detail Pengukuran ${displayTahun} - ${pdName}`;
+
+        // --- TAMBAHAN LOGIKA HITS UNTUK PENGUKURAN ---
+        if (idFilePengukuran && idFilePengukuran !== 'null' && idFilePengukuran !== '0' && idFilePengukuran !== '') {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+            fetch('/api/increment-hits', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
+                body: JSON.stringify({ 
+                    table: 'file_pengukuran', 
+                    id: idFilePengukuran, 
+                    pk: 'id_file_pengukuran' 
+                })
+            }).catch(err => console.error("Gagal update hits pengukuran:", err));
+        }
+        // ----------------------------------------------
 
         // Generate Dummy Data untuk Tabel
         const tbody = document.getElementById('pengukuran-detail-body');
@@ -695,7 +724,7 @@ window.fetchPengukuranData = function(tahun, triwulan = 'all') {
                         <td class="text-center">${index + 1}</td>
                         <td>${item.nama_satker}</td>
                         <td class="text-center">
-                            <button class="btn btn-sm text-white rounded-pill px-3 btn-lihat-data" style="background-color: var(--primary-blue);" onclick="viewPengukuranDetail('${item.nama_satker}')">
+                            <button class="btn btn-sm text-white rounded-pill px-3 btn-lihat-data" style="background-color: var(--primary-blue);" onclick="viewPengukuranDetail('${item.nama_satker}', '${item.id_file_pengukuran || 0}')">
                                 <i class="fas fa-eye me-1"></i> Lihat Data
                             </button>
                         </td>
@@ -877,3 +906,28 @@ document.addEventListener("DOMContentLoaded", function() {
     // Periksa status autentikasi saat halaman dimuat
     window.checkAuthStatus();
 });
+
+// Fungsi ini dijalankan ketika tombol/link preview PDF diklik
+function tambahHits(namaTabel, idData, primaryKey) {
+    fetch('/api/increment-hits', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            table: namaTabel,
+            id: idData,
+            pk: primaryKey // Opsional, karena di backend sudah ada $pkMapping
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.success) {
+            console.log('Hits berhasil ditambahkan ke tabel: ' + data.debug.table);
+        } else {
+            console.error('Gagal menambah hits');
+        }
+    })
+    .catch(error => console.error('Error memanggil API hits:', error));
+}

@@ -163,13 +163,14 @@ class ContentController extends Controller
         $pdName = $request->query('pd_name');
         $tahun = $request->query('tahun');
 
-        // Ambil data dari tabel file_pelaporan dan join dengan user untuk nama OPD
-        // Menggunakan pola yang sama dengan Evaluasi
-        $query = DB::table('file_pelaporan as fp')
-            ->leftJoin('user as u', 'fp.id_opd', '=', 'u.id_opd')
+        // PASTIKAN MENGGUNAKAN file_sakip
+        $query = DB::table('file_sakip as fs')
+            ->leftJoin('user as u', 'fs.id_opd', '=', 'u.id_opd')
             ->where('u.level', '!=', 'admin')
+            // Filter hanya dokumen LKJIP/LKJP (Sesuaikan dengan nama dokumen Anda di database)
+            ->where('fs.judul', 'like', '%LKJIP%') 
             ->select(
-                'fp.*',
+                'fs.*',
                 'u.nama_satker'
             );
 
@@ -178,11 +179,11 @@ class ContentController extends Controller
         }
 
         if ($tahun && $tahun !== 'all') {
-            $query->where('fp.tahun', $tahun);
+            $query->where('fs.tahun', $tahun);
         }
 
-        $query->orderBy('fp.tahun', 'desc')
-              ->orderBy('fp.tgl_posting', 'desc');
+        $query->orderBy('fs.tahun', 'desc')
+              ->orderBy('fs.tgl_posting', 'desc');
 
         return response()->json(['data' => $query->get()]);
     }
@@ -199,6 +200,7 @@ class ContentController extends Controller
             'file_evaluasi' => 'id_file_evaluasi',
             'file_pelaporan' => 'id_file_pelaporan',
             'file_pengukuran' => 'id_file_pengukuran',
+            'prestasi' => 'id_prestasi',
             'file_table' => 'id_file',
         ];
         

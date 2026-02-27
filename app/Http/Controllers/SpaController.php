@@ -183,14 +183,24 @@ class SpaController extends Controller
         $dataIkuKab = $queryIkuKab->get();
 
         // 3. Data Kinerja PD (List OPD)
-        // SESUAI PERMINTAAN: Datanya "tetap saja", tidak dipengaruhi filter triwulan.
-        $dataKinerjaPd = DB::table('user')
-            ->where('level', 'client')
-            ->where('status', 'aktif')
-            ->where('id_opd', '<>', '00_')
-            ->orderBy('kd_unit_kerja', 'ASC')
-            ->select('nama_satker', 'id_opd')
-            ->get();
+        // Kita join dengan tabel file_pengukuran agar mendapatkan id_file_pengukuran untuk fitur hits
+        $queryKinerjaPd = DB::table('user as u')
+            ->leftJoin('file_pengukuran as fp', function($join) use ($tahun, $triwulan) {
+                $join->on('u.id_opd', '=', 'fp.id_opd');
+                if ($tahun !== 'all') {
+                    $join->where('fp.tahun', '=', $tahun);
+                }
+                if ($triwulan !== 'all') {
+                    $join->where('fp.judul', '=', $triwulan);
+                }
+            })
+            ->where('u.level', 'client')
+            ->where('u.status', 'aktif')
+            ->where('u.id_opd', '<>', '00_')
+            ->orderBy('u.kd_unit_kerja', 'ASC')
+            ->select('u.nama_satker', 'u.id_opd', 'fp.id_file_pengukuran');
+            
+        $dataKinerjaPd = $queryKinerjaPd->get();
 
         return response()->json([
             'keuangan' => $dataKeuangan,

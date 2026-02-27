@@ -63,7 +63,8 @@
                                     <td class="text-center">{{ $index + 1 }}</td>
                                     <td>{{ $pd->nama_satker }}</td>
                                     <td class="text-center">
-                                        <button class="btn btn-sm btn-info text-white rounded-pill px-3" onclick="viewPdf('Prestasi {{ $pd->nama_satker }}', 'files/DUMMY.pdf')">
+                                        <button class="btn btn-sm btn-info text-white rounded-pill px-3" 
+                                                onclick="viewPdf('{{ $pd->judul ?? 'Prestasi ' . $pd->nama_satker }}', '{{ isset($pd->file_prestasi) ? asset('uploads/'.$pd->file_prestasi) : asset('files/DUMMY.pdf') }}', {{ $pd->hits ?? 0 }}, 'prestasi', '{{ $pd->id_prestasi ?? 0 }}', 'id_prestasi')">
                                             <i class="fas fa-eye me-1"></i> Lihat
                                         </button>
                                     </td>

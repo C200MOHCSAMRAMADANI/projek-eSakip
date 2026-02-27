@@ -89,7 +89,7 @@
                 </div>
                 <div class="modal-body p-0 pdf-modal-body">
                     <iframe id="pdfViewerFrame" src="" width="100%" height="100%" style="border:none;"></iframe>
-                </div>
+                </div>  
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                     <a href="#" id="btnDownloadPdf" class="btn btn-success" target="_blank" download><i class="fas fa-download me-1"></i> Unduh Dokumen</a>
