@@ -27,6 +27,11 @@ class AuthController extends Controller
 
         // Cek apakah user ada dan password cocok
         if ($user && Hash::check($request->password, $user->password)) {
+            // Integrasi Auth Laravel & Spatie
+            // Kita ambil instance Model User berdasarkan ID dari query DB sebelumnya
+            $userModel = \App\Models\User::find($user->id);
+            Auth::login($userModel);
+
             // Set session untuk login
             session([
                 'user_id' => $user->id,
@@ -54,6 +59,7 @@ class AuthController extends Controller
      */
     public function logout(Request $request)
     {
+        Auth::logout();
         session()->flush();
         return redirect('/')->with('success', 'Anda telah logout');
     }

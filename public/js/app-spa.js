@@ -515,9 +515,13 @@ window.fetchPelaporanData = function(pdName, tahun) {
         });
 }
 
+// Memori sementara agar hits tetap sinkron secara realtime tanpa refresh halaman
+if (typeof window.trackedHits === 'undefined') {
+    window.trackedHits = {};
+}
+
 // Fungsi untuk menampilkan Modal Preview PDF
-// Fungsi untuk menampilkan Modal Preview PDF
-window.viewPdf = function(title, url, hits = 0, table = null, id = null, pk = 'id') {
+window.viewPdf = function(title, url, originalHits = 0, table = null, id = null, pk = 'id') {
     const modalEl = document.getElementById('pdfPreviewModal');
     if (modalEl) {
         // Update Judul
@@ -534,22 +538,29 @@ window.viewPdf = function(title, url, hits = 0, table = null, id = null, pk = 'i
             modalTitle.parentNode.appendChild(hitsBadge);
         }
         
-        // Pastikan angka awal aman dari undefined
-        let currentHits = parseInt(hits) || 0;
+        // --- LOGIKA SINKRONISASI REALTIME ---
+        const docKey = table + '_' + id; // Membuat ID unik untuk dokumen ini
+        let currentHits = parseInt(originalHits) || 0;
+        
+        // Jika dokumen ini sudah pernah diklik sebelumnya di sesi ini, ambil angka terbarunya
+        if (window.trackedHits[docKey] !== undefined) {
+            currentHits = window.trackedHits[docKey];
+        }
+        
+        // Tampilkan angka saat ini di badge
         hitsBadge.innerHTML = `<i class="fas fa-eye me-1"></i> ${currentHits}`;
+        // ------------------------------------
 
         // Update Iframe
         const iframe = document.getElementById('pdfViewerFrame');
         if (iframe) iframe.src = url;
 
         // Update Tombol Download
-       // Update Tombol Download
         const btnDownload = document.getElementById('btnDownloadPdf');
         if (btnDownload) {
             btnDownload.href = url;
             
-            // --- LOGIKA HITS UNDUH (BARU) ---
-            // Hanya dieksekusi ketika tombol "Unduh Dokumen" di-klik
+            // --- LOGIKA HITS UNDUH ---
             btnDownload.onclick = function() {
                 if (table && id && id !== 'null' && id !== '0' && id !== '') {
                     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
@@ -564,11 +575,9 @@ window.viewPdf = function(title, url, hits = 0, table = null, id = null, pk = 'i
                     }).catch(err => console.error("Gagal update hits unduh:", err));
                 }
             };
-            // ---------------------------------
         }
 
-        // --- LOGIKA HITS TERPADU (YANG LAMA TETAP ADA) ---
-        // Dieksekusi otomatis saat Modal Preview terbuka (untuk hitungan "Lihat")
+        // --- LOGIKA HITS TERPADU ---
         if (table && id && id !== 'null' && id !== '0' && id !== '') {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             
@@ -582,11 +591,16 @@ window.viewPdf = function(title, url, hits = 0, table = null, id = null, pk = 'i
             })
             .then(response => {
                 if (response.ok) {
-                    // Update angka badge di modal secara instan (ditambah 1)
-                    hitsBadge.innerHTML = `<i class="fas fa-eye me-1"></i> ${currentHits + 1}`;
+                    const updatedHits = currentHits + 1;
+                    
+                    // Simpan angka terbaru ke memori sementara agar klik berikutnya akurat
+                    window.trackedHits[docKey] = updatedHits; 
+                    
+                    // Update angka badge di modal secara instan
+                    hitsBadge.innerHTML = `<i class="fas fa-eye me-1"></i> ${updatedHits}`;
                 }
             }).catch(err => console.error("Gagal update hits:", err));
-        } 
+        }
 
         // Tampilkan Modal
         const modal = new bootstrap.Modal(modalEl);

@@ -13,7 +13,10 @@ Route::get('/', function () {
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login.form');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::get('/dashboard-admin', [AuthController::class, 'dashboardAdmin']);
+
+Route::middleware(['auth', 'role:admin|moderator'])->group(function () {
+    Route::get('/dashboard-admin', [AuthController::class, 'dashboardAdmin']);
+});
 
 // Route untuk cek status autentikasi (API)
 Route::get('/api/auth-status', [AuthController::class, 'checkAuthStatus']);
