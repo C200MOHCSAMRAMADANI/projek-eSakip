@@ -257,4 +257,33 @@ class ContentController extends Controller
         }
         return response()->json(['success' => false], 400);
     }
+
+public function adminDashboard()
+{
+    $tahunSekarang = date('Y');
+    
+    // 1. Hitung file tahun ini
+    $fileTahunIni = DB::table('file_sakip')->where('tahun', $tahunSekarang)->count();
+    
+    // 2. Hitung file tahun sebelumnya
+    $fileTahunLalu = DB::table('file_sakip')->where('tahun', '<', $tahunSekarang)->count();
+    
+    // 3. Hitung Total OPD Aktif (User level client)
+    $totalOPD = DB::table('user')->where('level', 'client')->where('status', 'aktif')->count();
+    
+    // 4. Hitung OPD yang BELUM upload tahun ini
+    $opdSudahUpload = DB::table('file_sakip')
+                        ->where('tahun', $tahunSekarang)
+                        ->distinct('id_opd')
+                        ->count('id_opd');
+    $opdBelumUpload = $totalOPD - $opdSudahUpload;
+
+    return view('dashboard-admin', compact(
+        'fileTahunIni', 
+        'fileTahunLalu', 
+        'totalOPD', 
+        'opdBelumUpload'
+    ));
+}
+
 }

@@ -14,8 +14,10 @@ Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login.form
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
+Route::get('/admin/dashboard', [ContentController::class, 'adminDashboard'])->middleware('auth');
+
 Route::middleware(['auth', 'role:admin|moderator'])->group(function () {
-    Route::get('/dashboard-admin', [AuthController::class, 'dashboardAdmin']);
+Route::get('/dashboard-admin', [AuthController::class, 'dashboardAdmin']);
 });
 
 // Route untuk cek status autentikasi (API)

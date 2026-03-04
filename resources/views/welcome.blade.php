@@ -53,10 +53,19 @@
                             <li><span class="dropdown-item-text text-muted small">{{ ucfirst(session('level')) }}</span></li>
                             <li><hr class="dropdown-divider"></li>
                             @if(session('level') === 'admin' || session('level') === 'moderator')
-                            <li><a class="dropdown-item" href="/dashboard-admin"><i class="fas fa-tachometer-alt me-2"></i>Dashboard Admin</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            @endif
-                            <li><a class="dropdown-item text-danger" href="{{ route('logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+<li>
+    <span class="dropdown-item" style="cursor: pointer;" onclick="window.location.href='/dashboard-admin';">
+        <i class="fas fa-tachometer-alt me-2"></i>Dashboard Admin
+    </span>
+</li>
+<li><hr class="dropdown-divider"></li>
+@endif
+
+<li>
+    <span class="dropdown-item text-danger" style="cursor: pointer;" onclick="window.location.href='/logout';">
+        <i class="fas fa-sign-out-alt me-2"></i>Logout
+    </span>
+</li>
                         </ul>
                     </li>
                     @else

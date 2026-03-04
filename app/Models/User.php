@@ -13,14 +13,31 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
+     * Menentukan nama tabel secara spesifik
+     * (Mencegah Laravel mencari tabel default 'users')
+     */
+    protected $table = 'user';
+
+    /**
+     * Nonaktifkan timestamps jika tabel Anda tidak memiliki
+     * kolom 'created_at' dan 'updated_at'.
+     * (Hapus tanda // di bawah ini jika error timestamps muncul)
+     */
+    // public $timestamps = false;
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
     protected $fillable = [
-        'name',
-        'email',
+        'username',
         'password',
+        'nama_lengkap',
+        'level',
+        'status',
+        'nama_satker',
+        'id_opd',
     ];
 
     /**
@@ -41,7 +58,7 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
+            // 'email_verified_at' => 'datetime', // Dikomentari jika tidak ada fitur verifikasi email
             'password' => 'hashed',
         ];
     }

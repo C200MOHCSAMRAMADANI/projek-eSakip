@@ -923,8 +923,7 @@ window.addEventListener('hashchange', function() {
 
 // 3. Load Halaman saat pertama kali dibuka (Reload)
 document.addEventListener("DOMContentLoaded", function() {
-    // FIX: Otomatis ubah link navbar yang pakai onclick="loadPage(...)" menjadi href="#..."
-    // Ini mencegah konflik tombol kembali ke dashboard karena href="#"
+    // Logika merubah link ke Hash tetap biarkan saja (ini bagus untuk navigasi)
     document.querySelectorAll('a[onclick*="loadPage"]').forEach(anchor => {
         const match = anchor.getAttribute('onclick').match(/loadPage\(['"]([^'"]+)['"]\)/);
         if (match && match[1]) {
@@ -933,13 +932,14 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // Cek apakah ada hash di URL (misal #perencanaan)
+    // PENTING: Jangan panggil checkAuthStatus() jika Anda sudah pakai Blade @if(session)
+    // window.checkAuthStatus(); // <--- KOMENTARI ATAU HAPUS BARIS INI
+    
     const page = window.location.hash.substring(1);
-    // Jika ada hash load page tersebut, jika tidak load dashboard
     loadPage(page || 'dashboard');
 
     // Periksa status autentikasi saat halaman dimuat
-    window.checkAuthStatus();
+    //window.checkAuthStatus();
 });
 
 // Fungsi ini dijalankan ketika tombol/link preview PDF diklik

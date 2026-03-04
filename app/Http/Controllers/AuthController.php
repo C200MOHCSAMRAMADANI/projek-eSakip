@@ -84,9 +84,32 @@ class AuthController extends Controller
      * Show dashboard admin
      */
     public function dashboardAdmin()
-    {
-        return view('dashboard-admin');
-    }
+{
+    $tahunSekarang = date('Y');
+    
+    // 1. Hitung file tahun ini
+    $fileTahunIni = \Illuminate\Support\Facades\DB::table('file_sakip')->where('tahun', $tahunSekarang)->count();
+    
+    // 2. Hitung file tahun sebelumnya
+    $fileTahunLalu = \Illuminate\Support\Facades\DB::table('file_sakip')->where('tahun', '<', $tahunSekarang)->count();
+    
+    // 3. Hitung Total OPD Aktif (User level client)
+    $totalOPD = \Illuminate\Support\Facades\DB::table('user')->where('level', 'client')->where('status', 'aktif')->count();
+    
+    // 4. Hitung OPD yang BELUM upload tahun ini
+    $opdSudahUpload = \Illuminate\Support\Facades\DB::table('file_sakip')
+                        ->where('tahun', $tahunSekarang)
+                        ->distinct('id_opd')
+                        ->count('id_opd');
+    $opdBelumUpload = $totalOPD - $opdSudahUpload;
+
+    return view('dashboard-admin', compact(
+        'fileTahunIni', 
+        'fileTahunLalu', 
+        'totalOPD', 
+        'opdBelumUpload'
+    ));
+}
 
     /**
      * Check authentication status (API)
