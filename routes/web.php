@@ -1,9 +1,12 @@
 <?php
 
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\SpaController;
 use App\Http\Controllers\AuthController;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 Route::get('/', function () {
     return view('welcome');
@@ -49,3 +52,43 @@ Route::post('/api/increment-hits', [ContentController::class, 'incrementHits'])-
 
 //Route::post('/api/increment-hits-unduh')  
 Route::post('/api/increment-hits-unduh', [App\Http\Controllers\ContentController::class, 'incrementHitsUnduh'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+
+//Route:ADMIN PENGGUNA 
+// Route: ADMIN PENGGUNA (Mengambil data dari database)
+Route::get('/admin/pengguna', function () {
+    // Mengambil semua data dari tabel 'user'
+    $pengguna = User::orderBy('id', 'DESC')->get(); 
+
+    // Mengirim data $pengguna ke view 'pengguna.blade.php'
+    return view('pengguna', compact('pengguna')); 
+});
+
+
+// Di dalam routes/web.php
+Route::get('/admin/dokumen/{slug}', function ($slug) {
+    $mapping = [
+        'perencanaan'       => ['column' => 'renstra', 'title' => 'Dokumen Perencanaan'], // Tambahkan ini
+        'rencana-strategis' => ['column' => 'renstra', 'title' => 'Rencana Strategis'],
+        'rencana-kerja'     => ['column' => 'renja', 'title' => 'Rencana Kerja'],
+        'iku'               => ['column' => 'iku', 'title' => 'Indikator Kinerja Utama (IKU)'],
+        'perjanjian-kinerja'=> ['column' => 'rencana_aksi', 'title' => 'Perjanjian Kinerja'],
+        'sk-iku'            => ['column' => 'sk_iku', 'title' => 'SK IKU'],
+        'pohon-kinerja'     => ['column' => 'renstra', 'title' => 'Pohon Kinerja'],
+    ];
+
+    if (!isset($mapping[$slug])) { 
+        abort(404); 
+    }
+
+    $config = $mapping[$slug];
+    $column = $config['column'];
+    $title  = $config['title'];
+
+    $dokumen = DB::table('file')
+        ->join('user', 'file.id_opd', '=', 'user.id_opd')
+        ->select('user.nama_satker', "file.$column as file_path", 'file.create_at', 'file.update_at')
+        ->whereNotNull("file.$column")
+        ->get();
+
+    return view('dokumen_perencanaan', compact('dokumen', 'title'));
+});
