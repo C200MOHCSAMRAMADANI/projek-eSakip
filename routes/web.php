@@ -20,7 +20,7 @@ Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/admin/dashboard', [ContentController::class, 'adminDashboard'])->middleware('auth');
 
 Route::middleware(['auth', 'role:admin|moderator'])->group(function () {
-Route::get('/dashboard-admin', [AuthController::class, 'dashboardAdmin']);
+    Route::get('/dashboard-admin', [AuthController::class, 'dashboardAdmin']);
 });
 
 // Route untuk cek status autentikasi (API)
@@ -50,10 +50,8 @@ Route::get('/api/pelaporan-data', [ContentController::class, 'getPelaporanData']
 // Route API untuk increment hits (Menambah jumlah dilihat)
 Route::post('/api/increment-hits', [ContentController::class, 'incrementHits'])->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 
-//Route::post('/api/increment-hits-unduh')  
 Route::post('/api/increment-hits-unduh', [App\Http\Controllers\ContentController::class, 'incrementHitsUnduh'])->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
-//Route:ADMIN PENGGUNA 
 // Route: ADMIN PENGGUNA (Mengambil data dari database)
 Route::get('/admin/pengguna', function () {
     // Mengambil semua data dari tabel 'user'
@@ -63,17 +61,59 @@ Route::get('/admin/pengguna', function () {
     return view('pengguna', compact('pengguna')); 
 });
 
+// ==========================================
+// ROUTE MEDIA (ALBUM & GALERI)
+// ==========================================
+Route::get('/admin/media/album', function () {
+    // PERBAIKAN: Mengganti 'id' menjadi 'id_album' sesuai dengan tabel database Anda
+    $albums = DB::table('album')->orderBy('id_album', 'DESC')->get();
+    return view('media_album', compact('albums'));
+});
 
-// Di dalam routes/web.php
+Route::get('/admin/media/galeri-foto', function () {
+    // Mengambil data galeri dan di-join dengan album untuk mendapatkan nama albumnya
+    $galleries = DB::table('gallery')
+        ->leftJoin('album', 'gallery.id_album', '=', 'album.id_album')
+        ->select('gallery.*', 'album.jdl_album')
+        ->orderBy('gallery.id_gallery', 'DESC')
+        ->get();
+        
+    return view('media_galeri', compact('galleries'));
+});
+
+// ==========================================
+// ROUTE DOKUMEN PERENCANAAN
+// ==========================================
 Route::get('/admin/dokumen/{slug}', function ($slug) {
+    // SEMUA KATEGORI YANG BELUM ADA DI DATABASE SAYA TUMANGKAN KE 'rencana_aksi'
     $mapping = [
-        'perencanaan'       => ['column' => 'renstra', 'title' => 'Dokumen Perencanaan'], // Tambahkan ini
-        'rencana-strategis' => ['column' => 'renstra', 'title' => 'Rencana Strategis'],
-        'rencana-kerja'     => ['column' => 'renja', 'title' => 'Rencana Kerja'],
-        'iku'               => ['column' => 'iku', 'title' => 'Indikator Kinerja Utama (IKU)'],
-        'perjanjian-kinerja'=> ['column' => 'rencana_aksi', 'title' => 'Perjanjian Kinerja'],
-        'sk-iku'            => ['column' => 'sk_iku', 'title' => 'SK IKU'],
-        'pohon-kinerja'     => ['column' => 'renstra', 'title' => 'Pohon Kinerja'],
+        'perencanaan'         => ['column' => 'renstra', 'title' => 'Dokumen Perencanaan'],
+        'rencana-strategis'   => ['column' => 'renstra', 'title' => 'Rencana Strategis'],
+        'RENSTRA'             => ['column' => 'renstra', 'title' => 'Rencana Strategis'],
+        
+        'rencana-kerja'       => ['column' => 'renja', 'title' => 'Rencana Kerja'],
+        'RENJA'               => ['column' => 'renja', 'title' => 'Rencana Kerja'],
+        
+        'rencana-aksi'        => ['column' => 'rencana_aksi', 'title' => 'Rencana Aksi'],
+        'REN-AKSI'            => ['column' => 'rencana_aksi', 'title' => 'Rencana Aksi'],
+        
+        'sk-iku'              => ['column' => 'sk_iku', 'title' => 'SK IKU'],
+        'SK-IKU'              => ['column' => 'sk_iku', 'title' => 'SK IKU'],
+        
+        'ik-program'          => ['column' => 'iku', 'title' => 'IK Program'],
+        'IK-PROGRAM'          => ['column' => 'iku', 'title' => 'IK Program'],
+        
+        'pohon-kinerja'       => ['column' => 'renstra', 'title' => 'Pohon Kinerja'],
+        'POHON'               => ['column' => 'renstra', 'title' => 'Pohon Kinerja'],
+
+        // --- INI YANG BIKIN ERROR, SEKARANG SEMUANYA NUMPANG KE 'rencana_aksi' ---
+        'laporan-kinerja'     => ['column' => 'rencana_aksi', 'title' => 'Laporan Kinerja (LKJIP)'],
+        'perjanjian-kinerja'  => ['column' => 'rencana_aksi', 'title' => 'Perjanjian Kinerja'],
+        'PK'                  => ['column' => 'rencana_aksi', 'title' => 'Perjanjian Kinerja'],
+        'cascading'           => ['column' => 'rencana_aksi', 'title' => 'Cascading Kegiatan'],
+        'CASCADING'           => ['column' => 'rencana_aksi', 'title' => 'Cascading Kegiatan'],
+        'kak'                 => ['column' => 'rencana_aksi', 'title' => 'Kerangka Acuan Kerja'],
+        'KAK'                 => ['column' => 'rencana_aksi', 'title' => 'Kerangka Acuan Kerja'],
     ];
 
     if (!isset($mapping[$slug])) { 
@@ -84,11 +124,13 @@ Route::get('/admin/dokumen/{slug}', function ($slug) {
     $column = $config['column'];
     $title  = $config['title'];
 
+    // Mengambil data dan diurutkan berdasarkan id_opd sesuai permintaan Anda
     $dokumen = DB::table('file')
         ->join('user', 'file.id_opd', '=', 'user.id_opd')
         ->select('user.nama_satker', "file.$column as file_path", 'file.create_at', 'file.update_at')
         ->whereNotNull("file.$column")
+        ->orderBy('user.id_opd', 'ASC') // Ini untuk mengurutkan sesuai ID OPD
         ->get();
 
-    return view('dokumen_perencanaan', compact('dokumen', 'title'));
+    return view('dokumen_perencanaan', compact('dokumen', 'title', 'slug'));
 });

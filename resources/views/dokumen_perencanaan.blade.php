@@ -43,34 +43,34 @@
         </div>
         <div class="card-body p-2">
             <div class="nav flex-column nav-pills" role="tablist">
-                <a href="/admin/dokumen/rencana-strategis" class="nav-link {{ Request::is('admin/dokumen/rencana-strategis') ? 'active' : '' }}">
-                    <i class="fas me-2 small"></i> Rencana Strategis
-                </a>
-                <a href="/admin/dokumen/laporan-kinerja" class="nav-link {{ Request::is('admin/dokumen/laporan-kinerja') ? 'active' : '' }}">
-                    <i class="fas fa me-2 small"></i> Laporan Kinerja (LKJIP)
-                </a>
-                <a href="/admin/dokumen/rencana-kerja" class="nav-link {{ Request::is('admin/dokumen/rencana-kerja') ? 'active' : '' }}">
-                    <i class="fas f me-2 small"></i> Rencana Kerja
-                </a>
-                <a href="/admin/dokumen/rencana-aksi" class="nav-link {{ Request::is('admin/dokumen/rencana-aksi') ? 'active' : '' }}">
-                    <i class="fas fa me-2 small"></i> Rencana Aksi
-                </a>
-                <a href="/admin/dokumen/sk-iku" class="nav-link {{ Request::is('admin/dokumen/sk-iku') ? 'active' : '' }}">
-                    <i class="fas fa me-2 small"></i> SK-IKU
-                </a>
-                <a href="/admin/dokumen/ik-program" class="nav-link {{ Request::is('admin/dokumen/ik-program') ? 'active' : '' }}">
-                    <i class="fas fa me-2 small"></i> IK-Program
-                </a>
-                <a href="/admin/dokumen/perjanjian-kinerja" class="nav-link {{ Request::is('admin/dokumen/perjanjian-kinerja') ? 'active' : '' }}">
-                    <i class="fas fa me-2 small"></i> Perjanjian Kinerja
-                </a>
-                <a href="/admin/dokumen/cascading" class="nav-link {{ Request::is('admin/dokumen/cascading') ? 'active' : '' }}">
-                    <i class="fas fa me-2 small"></i> Cascading Program
-                </a>
-                <a href="/admin/dokumen/kak" class="nav-link {{ Request::is('admin/dokumen/kak') ? 'active' : '' }}">
-                    <i class="fas fa me-2 small"></i> Kerangka Acuan Kerja
-                </a>
-            </div>
+            <a href="/admin/dokumen/rencana-strategis" class="nav-link {{ Request::is('admin/dokumen/rencana-strategis') ? 'active' : '' }}">
+                <i class="fas fa-file-contract me-2 small"></i> Rencana Strategis
+            </a>
+            <a href="/admin/dokumen/laporan-kinerja" class="nav-link {{ Request::is('admin/dokumen/laporan-kinerja') ? 'active' : '' }}">
+                <i class="fas fa-file-invoice me-2 small"></i> Laporan Kinerja (LKJIP)
+            </a>
+            <a href="/admin/dokumen/rencana-kerja" class="nav-link {{ Request::is('admin/dokumen/rencana-kerja') ? 'active' : '' }}">
+                <i class="fas fa-calendar-alt me-2 small"></i> Rencana Kerja
+            </a>
+            <a href="/admin/dokumen/rencana-aksi" class="nav-link {{ Request::is('admin/dokumen/rencana-aksi') ? 'active' : '' }}">
+                <i class="fas fa-tasks me-2 small"></i> Rencana Aksi
+            </a>
+            <a href="/admin/dokumen/sk-iku" class="nav-link {{ Request::is('admin/dokumen/sk-iku') ? 'active' : '' }}">
+                <i class="fas fa-certificate me-2 small"></i> SK-IKU
+            </a>
+            <a href="/admin/dokumen/ik-program" class="nav-link {{ Request::is('admin/dokumen/ik-program') ? 'active' : '' }}">
+                <i class="fas fa-chart-line me-2 small"></i> IK-Program
+            </a>
+            <a href="/admin/dokumen/perjanjian-kinerja" class="nav-link {{ Request::is('admin/dokumen/perjanjian-kinerja') ? 'active' : '' }}">
+                <i class="fas fa-handshake me-2 small"></i> Perjanjian Kinerja
+            </a>
+            <a href="/admin/dokumen/cascading" class="nav-link {{ Request::is('admin/dokumen/cascading') ? 'active' : '' }}">
+                <i class="fas fa-sitemap me-2 small"></i> Cascading Program
+            </a>
+            <a href="/admin/dokumen/kak" class="nav-link {{ Request::is('admin/dokumen/kak') ? 'active' : '' }}">
+                <i class="fas fa-book me-2 small"></i> Kerangka Acuan Kerja
+            </a>
+        </div>
         </div>
     </div>
 </div>
