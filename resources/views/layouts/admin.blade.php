@@ -67,7 +67,7 @@
     <div class="d-flex">
         <div class="sidebar d-flex flex-column" style="width: 260px;">
             <div class="sidebar-header">
-                <i class="fas fa-shield-alt me-2" style="color: var(--primary-yellow);"></i> eSAKIP ADMIN
+                <i class="fw-bold fs-4 brand-title" style="color: var(--primary-yellow);"></i> eSAKIP ADMIN
             </div>
             
             <div class="p-3 mb-2" style="border-bottom: 1px solid rgba(255,255,255,0.1);">
