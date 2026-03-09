@@ -92,15 +92,26 @@ class SpaController extends Controller
     }
 
     private function get_opd_data($tahun, $judul) {
-        // Replikasi Logic dari CI Controller Perencanaan -> get_data()
-        /*
-        SELECT 
-            u.nama_satker, fa.id_file_sakip, fa.nama_file,
-            CASE WHEN fa.verifikasi = 1 THEN ... ELSE '' END AS path, ...
-        FROM (SELECT * FROM user WHERE level = 'client' AND status = 'aktif') u
-        LEFT JOIN file_sakip AS fa ON u.id_opd = fa.id_opd AND fa.judul = ? AND fa.tahun = ?
-        WHERE u.id_opd <> '00_' ORDER BY u.kd_unit_kerja ASC
-        */
+        // 1. Pemetaan Otomatis Kolom Hits berdasarkan Judul
+        // Penamaan disesuaikan dengan yang ada di Sidebar Anda
+        $hitsMapping = [
+            'Rencana Strategis'   => 'hits_renstra',
+            'Rencana Kerja'       => 'hits_renja',
+            'Rencana Aksi'        => 'hits_rencana_aksi',
+            'SK IKU'              => 'hits_sk_iku',
+            'SK-IKU'              => 'hits_sk_iku',
+            'IK Program'          => 'hits_iku',
+            'LK Program'          => 'hits_iku', // Tambahan untuk membaca LK Program
+            'Perjanjian Kinerja'  => 'hits_perjanjian_kinerja',
+            'Cascading Program'   => 'hits_cascading',
+            'Cascading Kegiatan'  => 'hits_cascading',
+            'Kerangka Acuan Kerja'=> 'hits_kak',
+            'Pohon Kinerja'       => 'hits_pohon_kinerja', // Sudah dipisah ke kolom sendiri
+            'Laporan Kinerja (LKJIP)' => 'hits_rencana_aksi',
+        ];
+
+        // Jika judul tidak dikenali, gunakan default 'hits'
+        $columnHits = $hitsMapping[$judul] ?? 'hits';
 
         $data = DB::table('user as u')
             ->leftJoin('file_sakip as fa', function($join) use ($tahun, $judul) {
@@ -120,29 +131,33 @@ class SpaController extends Controller
                 'fa.verifikasi',
                 'fa.tgl_verifikasi',
                 'fa.tahun',
-                'fa.hits'
+                // Ambil nilai secara dinamis dari database (Contoh: ambil data fa.hits_renja)
+                DB::raw("COALESCE(fa.$columnHits, 0) as hits_spesifik")
             )
             ->orderBy('u.kd_unit_kerja', 'ASC')
             ->get();
 
-        // pengambilan data pada perencanaaannnnn
-        return $data->map(function($item) {
-            // Path: uploads/tahun/id_opd+nama_lengkap/nama_file
-            // $path = ($item->verifikasi == 1 && $item->nama_file) 
-            //     ? asset('uploads/' . $item->tahun . '/' . $item->id_opd . $item->nama_lengkap . '/' . $item->nama_file) 
-            //     : asset('files/DUMMY.pdf');
-             $path = asset('files/DUMMY.pdf');
+        return $data->map(function($item) use ($columnHits) {
+            // PASTIKAN: ID dikirim kosong jika data tidak ada di tabel file_sakip
+            $idFile = $item->id_file_sakip ? $item->id_file_sakip : '';
+            
+            // Tampilkan PDF Dummy HANYA JIKA dokumen aslinya terdaftar di database
+            $path = $idFile ? asset('files/DUMMY.pdf') : '';
+            
             return [
                 'nama_satker' => $item->nama_satker,
                 'nama_file' => $item->nama_file,
                 'path' => $path,
                 'verifikasi' => $item->verifikasi,
                 'tgl_verifikasi' => $item->tgl_verifikasi,
-                'hits' => $item->hits ?? 0,
-                'id_file' => $item->id_file_sakip
+                'hits' => $item->hits_spesifik,
+                'id_file' => $idFile,
+                'table' => 'file_sakip',
+                'pk' => 'id_file_sakip',
+                'hits_column' => $columnHits // Kirimkan nama kolom hits-nya ke frontend
             ];
         });
-    }
+    }   
 
     public function getPengukuran(Request $request)
     {

@@ -193,6 +193,7 @@ class ContentController extends Controller
         $table = $request->input('table');
         $id = $request->input('id');
         $pk = $request->input('pk'); 
+        $column = $request->input('column', 'hits'); // TANGKAP KOLOM DINAMIS, default 'hits'
 
         // Mapping nama PK untuk setiap tabel
         $pkMapping = [
@@ -201,22 +202,22 @@ class ContentController extends Controller
             'file_pelaporan' => 'id_file_pelaporan',
             'file_pengukuran' => 'id_file_pengukuran',
             'prestasi' => 'id_prestasi',
+            'file' => 'id_file', // Tambahkan 'file' jika datanya pakai tabel file
             'file_table' => 'id_file',
         ];
         
-        // Gunakan pk dari request jika ada, atau gunakan mapping default
         if (!$pk && isset($pkMapping[$table])) {
             $pk = $pkMapping[$table];
         } elseif (!$pk) {
-            $pk = 'id'; // Default fallback
+            $pk = 'id';
         }
 
         if ($table && $id) {
-            // Pastikan tabel ada untuk keamanan dasar
             if (\Illuminate\Support\Facades\Schema::hasTable($table)) {
                 try {
-                    DB::table($table)->where($pk, $id)->increment('hits');
-                    return response()->json(['success' => true, 'debug' => ['table' => $table, 'pk' => $pk, 'id' => $id]]);
+                    // EKSEKUSI INCREMENT SECARA DINAMIS
+                    DB::table($table)->where($pk, $id)->increment($column);
+                    return response()->json(['success' => true, 'debug' => ['table' => $table, 'pk' => $pk, 'id' => $id, 'column' => $column]]);
                 } catch (\Exception $e) {
                     return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
                 }

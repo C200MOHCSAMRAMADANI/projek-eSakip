@@ -19,7 +19,7 @@
                     
                     <!-- Filter Section -->
                     <div class="filter-section justify-content-center mt-3">
-                        <label for="filter-tahun-prestasi" class="fw-bold text-primary mb-0">Tahun:</label>
+                        <label for="filter-tahun-prestasi" class="me-2 fw-bold text-secondary">Tahun:</label>
                         <select id="filter-tahun-prestasi" class="form-select form-select-sm" style="width: 120px; border-radius: 5px !important;">
                             @foreach($years as $y)
                                 <option value="{{ $y }}" {{ $y == date('Y') ? 'selected' : '' }}>{{ $y }}</option>

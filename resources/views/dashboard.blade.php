@@ -2,6 +2,7 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-6 hero-text-wrapper">
+                <br>
                 <h3 class="fw-bold mb-3">Transformasi Digital dan Pelayanan Publik Kabupaten Gunungkidul</h3>
                 <p>Platform terpadu yang menyinergikan tata kelola pemerintahan cerdas, ekonomi, lingkungan, dan kehidupan sosial. Dirancang untuk meningkatkan kualitas hidup masyarakat Gunungkidul melalui optimalisasi teknologi dan potensi daerah.</p>
             </div>

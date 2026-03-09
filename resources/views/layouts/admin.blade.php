@@ -7,11 +7,10 @@
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     
     <style>
-        /* Sidebar menyesuaikan warna utama aplikasi (primary-blue) */
+        /* Sidebar CSS (Sama seperti sebelumnya) */
         .sidebar {
             min-height: 100vh;
             background-color: var(--primary-blue);
@@ -20,7 +19,7 @@
             z-index: 1000;
         }
         .sidebar-header {
-            background-color: #0b4973; /* Sedikit lebih gelap dari primary-blue */
+            background-color: #0b4973;
             color: var(--login-white);
             text-align: center;
             padding: 20px 15px;
@@ -44,12 +43,17 @@
             border-left: 4px solid var(--primary-yellow);
         }
         
-        .content-wrapper {
-            padding: 30px;
-            width: 100%;
+        /* Tambahan CSS untuk Submenu agar lebih menjorok ke dalam */
+        .sidebar .submenu a {
+            padding: 10px 20px 10px 45px; /* Padding kiri lebih besar */
+            font-size: 0.9rem;
+            background-color: rgba(0, 0, 0, 0.15); /* Warna sedikit lebih gelap */
+        }
+        .sidebar .dropdown-toggle::after {
+            display: none; /* Menyembunyikan panah bawaan bootstrap */
         }
 
-        /* Memodifikasi style header halaman mengikuti page-header-bar di CSS Anda */
+        .content-wrapper { padding: 30px; width: 100%; }
         .admin-header-title {
             background-color: var(--login-white);
             padding: 15px 20px;
@@ -80,13 +84,50 @@
                 </div>
             </div>
 
-            <a href="/dashboard-admin" class="active"><i class="fas fa-tachometer-alt me-2"></i> Dashboard</a>
+            <a href="/dashboard-admin" class="{{ Request::is('dashboard-admin') ? 'active' : '' }}">
+                <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+            </a>
+
+            <a href="#masterSubmenu" data-bs-toggle="collapse" class="dropdown-toggle d-flex justify-content-between align-items-center {{ Request::is('admin/pengguna*') ? 'active' : '' }}">
+                <span><i class="fas fa-database me-2"></i> Master</span>
+                <i class="fas fa-caret-down"></i>
+            </a>
+            <div class="collapse submenu {{ Request::is('admin/pengguna*') ? 'show' : '' }}" id="masterSubmenu">
+                <a href="/admin/pengguna" class="{{ Request::is('admin/pengguna') ? 'text-warning' : '' }}">
+                    <i class="fas fa-users me-2"></i> Pengguna
+                </a>    
+            </div>
+            <a href="#dokumenSubmenu" data-bs-toggle="collapse" class="dropdown-toggle d-flex justify-content-between align-items-center {{ Request::is('admin/dokumen*') ? 'active' : '' }}">
+                <span><i class="fas fa-file-alt me-2"></i> Dokumen Sakip</span>
+                <i class="fas fa-caret-down"></i>
+            </a>
+            <div class="collapse submenu {{ Request::is('admin/dokumen*') ? 'show' : '' }}" id="dokumenSubmenu">
+                <a href="/admin/dokumen/perencanaan" class="{{ Request::is('admin/dokumen/perencanaan') ? 'text-warning' : '' }}">
+                    <i class="fas fa-edit me-2"></i> Perencanaan
+                </a>
+            </div>
+
+            <a href="#mediaSubmenu" data-bs-toggle="collapse" 
+            class="dropdown-toggle d-flex justify-content-between align-items-center {{ Request::is('admin/media*') ? 'active' : '' }}">
+                <span><i class="fas fa-photo-video me-2"></i> Media</span>
+                <i class="fas fa-caret-down"></i>
+            </a>
+            <div class="collapse submenu {{ Request::is('admin/media*') ? 'show' : '' }}" id="mediaSubmenu">
+                <a href="/admin/media/album" class="{{ Request::is('admin/media/album') ? 'text-warning' : '' }}">
+                    <i class="fas fa-folder me-2 small"></i> Album
+                </a>
+                <a href="/admin/media/galeri-foto" class="{{ Request::is('admin/media/galeri-foto') ? 'text-warning' : '' }}">
+                    <i class="fas fa-image me-2 small"></i> Galeri Foto
+                </a>
+            </div>
             <a href="/" onclick="window.location.href='/'; return false;"><i class="fas fa-external-link-alt me-2"></i> Lihat Website Depan</a>
             
             <a href="/logout" class="mt-auto" style="background-color: #ff3b30; color: white; border-left: none;">
                 <i class="fas fa-sign-out-alt me-2"></i> Keluar
             </a>
         </div>
+
+        
 
         <div class="content-wrapper flex-grow-1">
             @if(session('success'))

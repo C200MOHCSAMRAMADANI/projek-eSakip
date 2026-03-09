@@ -380,12 +380,20 @@ window.fetchDokumen = function(tahun, judul = 'Rencana Strategis') {
             if(tbodyKab) tbodyKab.innerHTML = rowsKab;
 
             // 2. Render Tabel OPD
+            // 2. Render Tabel OPD
+            // 2. Render Tabel OPD
             let rowsOpd = '';
             if(response.data && response.data.length > 0) {
                 response.data.forEach((item, index) => {
                     let actionBtn = '';
-                    if (item.path && item.path !== '') {
-                        actionBtn = `<button class="btn btn-sm btn-info text-white rounded-pill px-3" onclick="viewPdf('${item.nama_satker} - ${judul}', '${item.path}', ${item.hits}, 'file_sakip', '${item.id_file}', 'id_file_sakip')"><i class="fas fa-eye me-1"></i> Lihat</button>`;
+                    
+                    // CEK KETAT: Tombol Lihat HANYA muncul jika file & ID database-nya ada!
+                    if (item.path && item.path !== '' && item.id_file && item.id_file !== '') {
+                        
+                        // Menangkap nama kolom dari Backend secara otomatis (contoh: 'hits_renja')
+                        let targetColumn = item.hits_column || 'hits';
+                        
+                        actionBtn = `<button class="btn btn-sm btn-info text-white rounded-pill px-3" onclick="viewPdf('${item.nama_satker} - ${judul}', '${item.path}', ${item.hits || 0}, '${item.table}', '${item.id_file}', '${item.pk}', '${targetColumn}')"><i class="fas fa-eye me-1"></i> Lihat</button>`;
                     } else {
                         actionBtn = `<span class="badge bg-secondary text-white rounded-pill px-3">Belum Tersedia</span>`;
                     }
@@ -520,8 +528,8 @@ if (typeof window.trackedHits === 'undefined') {
     window.trackedHits = {};
 }
 
-// Fungsi untuk menampilkan Modal Preview PDF
-window.viewPdf = function(title, url, originalHits = 0, table = null, id = null, pk = 'id') {
+// 1. Tambahkan parameter hitsColumn = 'hits'
+window.viewPdf = function(title, url, originalHits = 0, table = null, id = null, pk = 'id', hitsColumn = 'hits') {
     const modalEl = document.getElementById('pdfPreviewModal');
     if (modalEl) {
         // Update Judul
@@ -578,6 +586,7 @@ window.viewPdf = function(title, url, originalHits = 0, table = null, id = null,
         }
 
         // --- LOGIKA HITS TERPADU ---
+        // 2. Di bagian fetch('/api/increment-hits'), tambahkan column ke dalam JSON.stringify
         if (table && id && id !== 'null' && id !== '0' && id !== '') {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
             
@@ -587,7 +596,7 @@ window.viewPdf = function(title, url, originalHits = 0, table = null, id = null,
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken
                 },
-                body: JSON.stringify({ table: table, id: id, pk: pk })
+                body: JSON.stringify({ table: table, id: id, pk: pk, column: hitsColumn }) // <-- UPDATE DI SINI
             })
             .then(response => {
                 if (response.ok) {
