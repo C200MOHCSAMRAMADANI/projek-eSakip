@@ -134,3 +134,14 @@ Route::get('/admin/dokumen/{slug}', function ($slug) {
 
     return view('dokumen_perencanaan', compact('dokumen', 'title', 'slug'));
 });
+// Route Dashboard Client
+Route::get('/dashboard-client', [AuthController::class, 'dashboardClient'])->middleware('auth')->name('dashboard.client');
+
+// Route untuk menu Dokumen Sakip -> Perencanaan (yang ada di sidebar)
+Route::get('/client/dokumen/perencanaan', [AuthController::class, 'clientPerencanaan'])->middleware('auth')->name('client.perencanaan');
+
+// Route untuk upload dokumen perencanaan
+Route::post('/client/dokumen/upload', [AuthController::class, 'uploadDokumen'])->middleware('auth')->name('client.upload');
+
+// Route untuk delete dokumen perencanaan
+Route::delete('/client/dokumen/delete', [AuthController::class, 'deleteDokumen'])->middleware('auth')->name('client.delete');
