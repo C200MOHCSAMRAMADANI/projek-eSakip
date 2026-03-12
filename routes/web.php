@@ -134,13 +134,33 @@ Route::get('/admin/dokumen/{slug}', function ($slug) {
 
     return view('dokumen_perencanaan', compact('dokumen', 'title', 'slug'));
 });
-// Route Dashboard Client
+// Route Dashboard Client (OPD)
 Route::get('/dashboard-client', [AuthController::class, 'dashboardClient'])->middleware('auth')->name('dashboard.client');
 
-// Route untuk menu Dokumen Sakip -> Perencanaan (yang ada di sidebar)
+// Route Dashboard Client PEMKAB
+Route::get('/dashboard-client-pemkab', [AuthController::class, 'dashboardClientPEMKAB'])->middleware('auth')->name('dashboard.client.pemkab');
+
+// Route untuk menu Dokumen Sakip -> Perencanaan OPD (yang ada di sidebar)
 Route::get('/client/dokumen/perencanaan', [AuthController::class, 'clientPerencanaan'])->middleware('auth')->name('client.perencanaan');
 
-// Route untuk upload dokumen perencanaan
+// Route untuk menu Dokumen Sakip -> Perencanaan PEMKAB
+Route::get('/client/dokumen/perencanaan-pemkab', [AuthController::class, 'clientPerencanaanPEMKAB'])->middleware('auth')->name('client.perencanaan.pemkab');
+
+// Route untuk halaman upload dokumen PEMKAB
+Route::get('/client/dokumen/upload-pemkab', function() {
+    if (!Auth::check()) {
+        return redirect('/login');
+    }
+    if (Auth::user()->id_opd !== '00_') {
+        return redirect('/dashboard-client');
+    }
+    return view('client-upload-pemkab');
+})->middleware('auth')->name('client.upload.pemkab');
+
+// Route untuk proses upload dokumen PEMKAB
+Route::post('/client/dokumen/upload-pemkab', [AuthController::class, 'uploadDokumenPEMKAB'])->middleware('auth')->name('client.upload.pemkab.post');
+
+// Route untuk upload dokumen perencanaan OPD
 Route::post('/client/dokumen/upload', [AuthController::class, 'uploadDokumen'])->middleware('auth')->name('client.upload');
 
 // Route untuk delete dokumen perencanaan

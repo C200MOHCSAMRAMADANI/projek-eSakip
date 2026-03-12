@@ -47,7 +47,11 @@ class AuthController extends Controller
             if ($user->level === 'admin' || $user->level === 'moderator') {
                 return redirect('/dashboard-admin')->with('success', 'Selamat datang, ' . $user->nama_lengkap);
             } 
-            // ---> TAMBAHAN: Redirect khusus untuk level client
+            // Redirect untuk client PEMKAB (id_opd = '00_')
+            elseif ($user->level === 'client' && $user->id_opd === '00_') {
+                return redirect('/dashboard-client-pemkab')->with('success', 'Selamat datang, ' . $user->nama_lengkap);
+            }
+            // Redirect untuk client OPD
             elseif ($user->level === 'client') {
                 return redirect('/dashboard-client')->with('success', 'Selamat datang, ' . $user->nama_lengkap);
             }
@@ -78,7 +82,11 @@ class AuthController extends Controller
             if (session('level') === 'admin' || session('level') === 'moderator') {
                 return redirect('/dashboard-admin')->with('info', 'Anda sudah logged in.');
             }
-            // ---> TAMBAHAN: Cek jika yang sudah login adalah client
+            // Cek jika yang sudah login adalah client PEMKAB
+            elseif (session('level') === 'client' && session('id_opd') === '00_') {
+                return redirect('/dashboard-client-pemkab')->with('info', 'Anda sudah logged in.');
+            }
+            // Cek jika yang sudah login adalah client OPD
             elseif (session('level') === 'client') {
                 return redirect('/dashboard-client')->with('info', 'Anda sudah logged in.');
             }
@@ -143,6 +151,55 @@ class AuthController extends Controller
             'authenticated' => false
         ]);
     }
+    /**
+     * Show dashboard client PEMKAB - Menampilkan data untuk PEMKAB
+     */
+    public function dashboardClientPEMKAB()
+    {
+        // Pastikan user sudah login
+        if (!Auth::check()) {
+            return redirect('/login');
+        }
+
+        $tahunSekarang = date('Y');
+        $nama_lengkap = Auth::user()->nama_lengkap;
+
+        // Hitung total file semua OPD tahun ini
+        $fileTahunIni = DB::table('file_sakip')
+            ->where('tahun', $tahunSekarang)
+            ->count();
+        
+        // Hitung total file semua OPD (semua tahun)
+        $totalFile = DB::table('file_sakip')->count();
+        
+        // Hitung total OPD aktif
+        $totalOPD = DB::table('user')->where('level', 'client')->where('status', 'aktif')->count();
+        
+        // Hitung OPD yang sudah upload tahun ini
+        $opdSudahUpload = DB::table('file_sakip')
+            ->where('tahun', $tahunSekarang)
+            ->distinct('id_opd')
+            ->count('id_opd');
+        $opdBelumUpload = $totalOPD - $opdSudahUpload;
+
+        // Hitung dokumen yang sudah diverifikasi
+        $dokumenTerverifikasi = DB::table('file_sakip')->where('verifikasi', 1)->count();
+
+        // Hitung dokumen yang belum diverifikasi
+        $dokumenMenunggu = DB::table('file_sakip')->where('verifikasi', 0)->count();
+
+        return view('dashboard-client-pemkab', compact(
+            'fileTahunIni', 
+            'totalFile', 
+            'totalOPD',
+            'opdSudahUpload',
+            'opdBelumUpload',
+            'dokumenTerverifikasi',
+            'dokumenMenunggu',
+            'nama_lengkap'
+        ));
+    }
+
     /**
      * Show dashboard client - Menampilkan data spesifik OPD yang login
      */
@@ -223,28 +280,93 @@ class AuthController extends Controller
         $nama_satker = Auth::user()->nama_satker;
         $tahunSekarang = date('Y');
 
-        // Ambil semua dokumen perencanaan OPD ini
-        $dokumen_perencanaan = DB::table('file_sakip')
+        // Ambil dokumen OPD ini dari database
+        $dokumenOPD = DB::table('file_sakip')
             ->where('id_opd', $id_opd)
             ->orderBy('tahun', 'DESC')
             ->orderBy('created_at', 'DESC')
             ->get();
 
-        // Hitung statistik dokumen
+        // Daftar 10 dokumen OPD (sesuai permintaan user - TIDAK DIUBAH)
+        $dokumenList = [
+            'Rencana Strategis (RENSTRA)',
+            'Rencana Kerja (RENJA)',
+            'Rencana Aksi (RENAKSI)',
+            'SK Indikator Kinerja Utama (IKU)',
+            'Indikator Kinerja Program',
+            'Pohon Kinerja Organisasi',
+            'Cascading Kinerja',
+            'Perjanjian Kinerja (PK)',
+            'Laporan Kinerja (LKJIP)',
+            'Kerangka Acuan Kerja (KAK)',
+        ];
+
+        // Hitung statistik
         $stats = [
-            'total' => DB::table('file_sakip')->where('id_opd', $id_opd)->count(),
-            'terverifikasi' => DB::table('file_sakip')->where('id_opd', $id_opd)->where('verifikasi', 1)->count(),
-            'menunggu' => DB::table('file_sakip')->where('id_opd', $id_opd)->where(function($query) {
-                $query->where('verifikasi', 0)->orWhereNull('verifikasi');
-            })->count(),
-            'tahun_ini' => DB::table('file_sakip')->where('id_opd', $id_opd)->where('tahun', $tahunSekarang)->count(),
+            'total' => $dokumenOPD->count(),
+            'terverifikasi' => $dokumenOPD->where('verifikasi', 1)->count(),
+            'menunggu' => $dokumenOPD->filter(function($d) { return $d->verifikasi == 0 || is_null($d->verifikasi); })->count(),
+            'tahun_ini' => $dokumenOPD->where('tahun', $tahunSekarang)->count(),
         ];
 
         return view('client-perencanaan', compact(
-            'dokumen_perencanaan', 
+            'dokumenOPD',
+            'dokumenList',
             'nama_satker',
             'stats',
             'tahunSekarang'
+        ));
+    }
+
+    /**
+     * Show client perencanaan PEMKAB page - Menampilkan 8 dokumen untuk PEMKAB
+     */
+    public function clientPerencanaanPEMKAB()
+    {
+        // Pastikan user sudah login
+        if (!Auth::check()) {
+            return redirect('/login');
+        }
+
+        $nama_lengkap = Auth::user()->nama_lengkap;
+        $tahunSekarang = date('Y');
+
+        // Ambil data dokumen yang sudah diupload oleh PEMKAB (id_opd = '00_')
+        $dokumenUploaded = DB::table('file_sakip')
+            ->where('id_opd', '00_')
+            ->orderBy('tahun', 'DESC')
+            ->get();
+
+        // Daftar 8 dokumen PEMKAB
+        $dokumenPEMKAB = [
+            ['key' => 'RPJPD', 'judul' => 'RPJPD (Rencana Pembangunan Jangka Panjang Daerah)'],
+            ['key' => 'RPJMD', 'judul' => 'RPJMD (Rencana Pembangunan Jangka Menengah Daerah)'],
+            ['key' => 'RKPD', 'judul' => 'RKPD (Rencana Kerja Pemerintah Daerah)'],
+            ['key' => 'SK IKU', 'judul' => 'SK IKU (SK Indikator Kinerja Utama)'],
+            ['key' => 'LKJIP', 'judul' => 'LKJIP (Laporan Kinerja Instansi Pemerintah)'],
+            ['key' => 'Perjanjian Kinerja', 'judul' => 'Perjanjian Kinerja'],
+            ['key' => 'Laporan Hasil Evaluasi', 'judul' => 'Laporan Hasil Evaluasi'],
+            ['key' => 'Cascading Kinerja', 'judul' => 'Cascading Kinerja'],
+        ];
+
+        // Proses untuk mencocokkan dokumen upload dengan daftar dokumen
+        foreach ($dokumenPEMKAB as &$doc) {
+            $doc['data'] = null;
+            foreach ($dokumenUploaded as $upload) {
+                // Cek apakah judul upload mengandung keyword dokumen
+                if (strpos($upload->judul, $doc['key']) !== false || 
+                    strpos($doc['key'], $upload->judul) !== false ||
+                    stripos($upload->judul, $doc['key']) !== false) {
+                    $doc['data'] = $upload;
+                    break;
+                }
+            }
+        }
+
+        return view('client-perencanaan-pemkab', compact(
+            'nama_lengkap',
+            'tahunSekarang',
+            'dokumenPEMKAB'
         ));
     }
 
@@ -295,6 +417,59 @@ class AuthController extends Controller
             ]);
 
             return back()->with('success', 'Dokumen berhasil diupload dan menunggu verifikasi!');
+        }
+
+        return back()->with('error', 'Gagal upload dokumen. Silakan coba lagi.');
+    }
+
+    /**
+     * Handle upload dokumen perencanaan PEMKAB
+     */
+    public function uploadDokumenPEMKAB(Request $request)
+    {
+        // Pastikan user sudah login
+        if (!Auth::check()) {
+            return redirect('/login');
+        }
+
+        // Validasi input
+        $request->validate([
+            'jenis_dokumen' => 'required|string',
+            'judul' => 'required|string|max:100',
+            'tahun' => 'required|integer|min:2018|max:2030',
+            'file' => 'required|file|mimes:pdf,doc,docx,xls,xlsx|max:10240',
+        ]);
+
+        $id_opd = Auth::user()->id_opd;
+        
+        // Handle file upload
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            
+            // Buat folder uploads jika belum ada
+            if (!file_exists(public_path('uploads'))) {
+                mkdir(public_path('uploads'), 0777, true);
+            }
+            
+            // Simpan file ke folder public/uploads
+            $file->move(public_path('uploads'), $filename);
+            
+            // Simpan ke database
+            DB::table('file_sakip')->insert([
+                'id_opd' => $id_opd,
+                'judul' => $request->judul,
+                'nama_file' => $filename,
+                'tgl_posting' => now(),
+                'tahun' => $request->tahun,
+                'hits' => 0,
+                'status' => 1,
+                'verifikasi' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            return redirect('/client/dokumen/perencanaan-pemkab')->with('success', 'Dokumen berhasil diupload dan menunggu verifikasi!');
         }
 
         return back()->with('error', 'Gagal upload dokumen. Silakan coba lagi.');
