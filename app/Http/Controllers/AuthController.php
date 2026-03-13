@@ -12,27 +12,30 @@ class AuthController extends Controller
     /**
      * Handle login request
      */
+    /**
+     * Handle login request (Dengan Keamanan Ganda: MD5 & Bcrypt)
+     */
     public function login(Request $request)
     {
         $request->validate([
-            'username' => 'required|string',
-            'password' => 'required|string',
+            'username'       => 'required|string',
+            'password'       => 'required|string',
+            'password_kedua' => 'required|string',
         ]);
 
-        // Ambil user dari tabel user (bukan users default Laravel)
         $user = DB::table('user')
             ->where('username', $request->username)
             ->where('status', 'aktif')
             ->first();
 
-        // Cek apakah user ada dan password cocok
-        if ($user && Hash::check($request->password, $user->password)) {
-            // Integrasi Auth Laravel & Spatie
-            // Kita ambil instance Model User berdasarkan ID dari query DB sebelumnya
+        // Verifikasi Ganda
+        if ($user && 
+            md5($request->password) === $user->password && 
+            Hash::check($request->password_kedua, $user->password_kedua)
+        ) {
             $userModel = \App\Models\User::find($user->id);
             Auth::login($userModel);
 
-            // Set session untuk login
             session([
                 'user_id' => $user->id,
                 'username' => $user->username,
@@ -43,23 +46,18 @@ class AuthController extends Controller
                 'logged_in' => true,
             ]);
 
-            // Redirect berdasarkan level user
             if ($user->level === 'admin' || $user->level === 'moderator') {
                 return redirect('/dashboard-admin')->with('success', 'Selamat datang, ' . $user->nama_lengkap);
-            } 
-            // Redirect untuk client PEMKAB (id_opd = '00_')
-            elseif ($user->level === 'client' && $user->id_opd === '00_') {
+            } elseif ($user->level === 'client' && $user->id_opd === '00_') {
                 return redirect('/dashboard-client-pemkab')->with('success', 'Selamat datang, ' . $user->nama_lengkap);
-            }
-            // Redirect untuk client OPD
-            elseif ($user->level === 'client') {
+            } elseif ($user->level === 'client') {
                 return redirect('/dashboard-client')->with('success', 'Selamat datang, ' . $user->nama_lengkap);
             }
 
             return redirect('/')->with('success', 'Selamat datang, ' . $user->nama_lengkap);
         }
 
-        return back()->with('error', 'Username atau password salah!')->withInput();
+        return back()->with('error', 'Gagal Login! Username atau salah satu sandi Anda salah.')->withInput();
     }
 
     /**

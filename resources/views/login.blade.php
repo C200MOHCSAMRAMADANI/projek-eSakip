@@ -120,10 +120,18 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="password" class="form-label fw-bold">Password</label>
+                            <label for="password" class="form-label fw-bold">Sandi Pertama (MD5)</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-light"><i class="fas fa-lock"></i></span>
-                                <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan password" required>
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Masukkan sandi pertama" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="password_kedua" class="form-label fw-bold">Sandi Kedua (Bcrypt)</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light"><i class="fas fa-key"></i></span>
+                                <input type="password" class="form-control" id="password_kedua" name="password_kedua" placeholder="Masukkan sandi kedua" required>
                             </div>
                         </div>
                         <div class="mb-3 form-check">
